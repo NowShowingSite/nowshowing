@@ -49,15 +49,4 @@ export default async function MovieDetailPage({
       <RatingForm movieId={movie.id} />
     </div>
   );
-}          <li key={i}>
-            {r.profiles?.username ?? "someone"}: {r.score}
-          </li>
-        ))}
-      </ul>
-
-      {/* This is a client component -- it needs to know who's
-          logged in and handle the form submission interactively. */}
-      <RatingForm movieId={movie.id} />
-    </div>
-  );
 }
