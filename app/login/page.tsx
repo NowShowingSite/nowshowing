@@ -12,9 +12,39 @@ export default function LoginPage() {
   const [message, setMessage] = useState("");
 
   async function handleLogin() {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) setMessage(error.message);
-    else router.push("/");
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+
+    // Make sure a matching row exists in "profiles" -- this is what
+    // ratings are linked to. Without this, submitting a rating fails
+    // because there's nothing for it to attach to.
+    const user = data.user;
+    const { data: existingProfile } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (!existingProfile) {
+      // Default username from the email (e.g. "adam" from "adam@x.com").
+      // They can change this later once a proper profile page exists.
+      const defaultUsername = user.email!.split("@")[0];
+      const { error: insertError } = await supabase
+        .from("profiles")
+        .insert({ id: user.id, username: defaultUsername });
+
+      // Usernames must be unique -- if someone else already has this
+      // one (e.g. two people both named "adam"), fall back to the
+      // full email address so login still succeeds.
+      if (insertError) {
+        await supabase.from("profiles").insert({ id: user.id, username: user.email });
+      }
+    }
+
+    router.push("/");
   }
 
   async function handleSignUp() {
