@@ -1,11 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap');
+
 :root {
-  --bg: #0c0c10;
-  --surface: #17171d;
+  --bg: #0b0b0f;
+  --surface: #17151d;
+  --surface-2: #1f1c26;
   --gold: #e8b94a;
   --gold-dim: #8a7130;
+  --red: #9a1f2b;
   --text: #f2efe8;
   --text-muted: #a9a6a0;
-  --divider: #2a2a32;
+  --divider: #2a2733;
 }
 
 * {
@@ -15,8 +19,23 @@
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: system-ui, sans-serif;
+  font-family: 'Space Mono', monospace;
   margin: 0;
+}
+
+h1, h2, h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.03em;
+  color: var(--gold);
+  margin: 0 0 8px;
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+a {
+  color: inherit;
 }
 
 .site-header {
@@ -28,8 +47,9 @@ body {
 }
 
 .site-logo {
-  font-size: 1.4rem;
-  font-weight: 700;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.8rem;
+  letter-spacing: 0.04em;
   color: var(--gold);
   text-decoration: none;
 }
@@ -40,12 +60,20 @@ body {
   border: 1px solid var(--gold-dim);
   padding: 6px 14px;
   border-radius: 20px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.82rem;
+  background: none;
+}
+
+.login-link:hover {
+  border-color: var(--gold);
+  color: var(--gold);
 }
 
 .movie-list {
-  max-width: 700px;
+  max-width: 720px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 32px 24px 80px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -53,24 +81,109 @@ body {
 
 .movie-row {
   display: flex;
-  justify-content: space-between;
-  padding: 12px 16px;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 16px 10px 10px;
   background: var(--surface);
+  border: 1px solid var(--divider);
   border-radius: 10px;
   text-decoration: none;
   color: var(--text);
+  transition: border-color 0.15s ease;
+}
+
+.movie-row:hover {
+  border-color: var(--gold-dim);
+}
+
+.movie-row-poster {
+  width: 42px;
+  height: 63px;
+  object-fit: cover;
+  border-radius: 4px;
+  background: var(--surface-2);
+  flex-shrink: 0;
+}
+
+.movie-row-info {
+  flex: 1;
+  min-width: 0;
 }
 
 .movie-row .avg-score {
   color: var(--gold);
   font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ---------- Movie detail "ticket" layout ---------- */
+.ticket {
+  background: linear-gradient(180deg, var(--surface), var(--surface-2));
+  border: 1px solid var(--divider);
+  border-radius: 14px;
+  padding: 32px;
+  display: flex;
+  gap: 28px;
+}
+
+.ticket-poster {
+  width: 160px;
+  height: 240px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: var(--surface-2);
+  flex-shrink: 0;
+}
+
+.ticket-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.meta-line {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  margin-bottom: 16px;
+}
+
+.meta-line span + span::before {
+  content: " · ";
+  margin: 0 0.5em;
+}
+
+@media (max-width: 560px) {
+  .ticket {
+    flex-direction: column;
+  }
+  .ticket-poster {
+    width: 140px;
+    height: 210px;
+    margin: 0 auto;
+  }
+}
+
+.ratings-list {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ratings-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--surface-2);
+  border-radius: 6px;
 }
 
 .rating-form {
   display: flex;
   gap: 10px;
   align-items: center;
-  margin-top: 16px;
+  margin-top: 12px;
 }
 
 .rating-form input {
@@ -80,6 +193,7 @@ body {
   border: 1px solid var(--divider);
   background: var(--bg);
   color: var(--text);
+  font-family: 'Space Mono', monospace;
 }
 
 .rating-form button {
@@ -88,15 +202,21 @@ body {
   border: none;
   background: var(--gold);
   color: #000;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
+  font-family: 'Space Mono', monospace;
+}
+
+.rating-form button:hover {
+  opacity: 0.9;
 }
 
 .login-box {
   max-width: 360px;
   margin: 60px auto;
-  padding: 24px;
+  padding: 28px;
   background: var(--surface);
+  border: 1px solid var(--divider);
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -109,6 +229,7 @@ body {
   border: 1px solid var(--divider);
   background: var(--bg);
   color: var(--text);
+  font-family: 'Space Mono', monospace;
 }
 
 .login-box button {
@@ -117,6 +238,11 @@ body {
   border: none;
   background: var(--gold);
   color: #000;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
+  font-family: 'Space Mono', monospace;
+}
+
+.login-box button:hover {
+  opacity: 0.9;
 }

@@ -14,7 +14,7 @@ async function getMovies() {
 
   const { data: movies, error } = await supabase
     .from("movies")
-    .select("id, slug, title, year")
+    .select("id, slug, title, year, poster_url")
     .order("title");
 
   if (error) {
@@ -59,9 +59,14 @@ export default async function HomePage() {
       )}
       {movies.map((movie: any) => (
         <Link key={movie.id} href={`/movie/${movie.slug}`} className="movie-row">
-          <span>
+          {movie.poster_url ? (
+            <img src={movie.poster_url} alt="" className="movie-row-poster" />
+          ) : (
+            <div className="movie-row-poster" />
+          )}
+          <div className="movie-row-info">
             {movie.title} {movie.year ? `(${movie.year})` : ""}
-          </span>
+          </div>
           <span className="avg-score">
             {movie.avg} {movie.count > 0 && `(${movie.count})`}
           </span>

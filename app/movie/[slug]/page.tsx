@@ -10,7 +10,7 @@ async function getMovie(slug: string) {
 
   const { data: movie, error } = await supabase
     .from("movies")
-    .select("id, title, year, genre, director, runtime")
+    .select("id, title, year, genre, director, runtime, poster_url")
     .eq("slug", slug)
     .single();
 
@@ -59,27 +59,38 @@ export default async function MovieDetailPage({
 
   return (
     <div className="movie-list">
-      <h1>
-        {movie.title} {movie.year ? `(${movie.year})` : ""}
-      </h1>
-      <p>
-        {movie.genre} {movie.runtime ? `· ${movie.runtime}m` : ""}
-      </p>
-      <p>Director: {movie.director}</p>
+      <div className="ticket">
+        {movie.poster_url ? (
+          <img src={movie.poster_url} alt="" className="ticket-poster" />
+        ) : (
+          <div className="ticket-poster" />
+        )}
+        <div className="ticket-info">
+          <h1>
+            {movie.title} {movie.year ? `(${movie.year})` : ""}
+          </h1>
+          <div className="meta-line">
+            <span>{movie.genre}</span>
+            {movie.runtime && <span>{movie.runtime}m</span>}
+          </div>
+          <p>Director: {movie.director}</p>
 
-      <h3>Ratings</h3>
-      {ratings.length === 0 && <p>No ratings yet — be the first.</p>}
-      <ul>
-        {ratings.map((r, i) => (
-          <li key={i}>
-            {r.username}: {r.score}
-          </li>
-        ))}
-      </ul>
+          <h3>Ratings</h3>
+          {ratings.length === 0 && <p>No ratings yet — be the first.</p>}
+          <ul className="ratings-list">
+            {ratings.map((r, i) => (
+              <li key={i}>
+                <span>{r.username}</span>
+                <span style={{ color: "var(--gold)" }}>{r.score}</span>
+              </li>
+            ))}
+          </ul>
 
-      {/* This is a client component -- it needs to know who's
-          logged in and handle the form submission interactively. */}
-      <RatingForm movieId={movie.id} />
+          {/* This is a client component -- it needs to know who's
+              logged in and handle the form submission interactively. */}
+          <RatingForm movieId={movie.id} />
+        </div>
+      </div>
     </div>
   );
 }
