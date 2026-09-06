@@ -9,11 +9,20 @@ export default function AuthStatus() {
   const supabase = createClient();
   const router = useRouter();
   const [email, setEmail] = useState<string | null | undefined>(undefined); // undefined = "still checking"
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     // Check who's logged in right now.
-    supabase.auth.getUser().then(({ data }) => {
+    supabase.auth.getUser().then(async ({ data }) => {
       setEmail(data.user?.email ?? null);
+      if (data.user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("is_admin")
+          .eq("id", data.user.id)
+          .single();
+        setIsAdmin(profile?.is_admin ?? false);
+      }
     });
 
     // Keep this in sync if the user logs in/out in another tab, or
@@ -39,6 +48,11 @@ export default function AuthStatus() {
   if (email) {
     return (
       <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+        {isAdmin && (
+          <Link href="/add-movie" className="login-link">
+            Add Movie
+          </Link>
+        )}
         <span style={{ color: "#a9a6a0" }}>Logged in as {email}</span>
         <button onClick={handleLogout} className="login-link" style={{ cursor: "pointer" }}>
           Log out
