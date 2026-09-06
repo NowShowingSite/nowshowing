@@ -14,7 +14,7 @@ async function getMovies() {
 
   const { data: movies, error } = await supabase
     .from("movies")
-    .select("id, slug, title, year, ratings(score)")
+    .select("id, slug, title, year")
     .order("title");
 
   if (error) {
@@ -23,11 +23,21 @@ async function getMovies() {
     return { movies: [], error: error.message };
   }
 
-  const mapped = (movies ?? []).map((movie: any) => {
-    const scores = movie.ratings.map((r: any) => r.score);
+  // Fetch all ratings separately and group them by movie, rather than
+  // using a nested join (which was unreliable -- see movie detail page).
+  const { data: ratings } = await supabase.from("ratings").select("movie_id, score");
+
+  const scoresByMovie: Record<string, number[]> = {};
+  (ratings ?? []).forEach((r) => {
+    if (!scoresByMovie[r.movie_id]) scoresByMovie[r.movie_id] = [];
+    scoresByMovie[r.movie_id].push(r.score);
+  });
+
+  const mapped = (movies ?? []).map((movie) => {
+    const scores = scoresByMovie[movie.id] ?? [];
     const avg =
       scores.length > 0
-        ? (scores.reduce((a: number, b: number) => a + b, 0) / scores.length).toFixed(1)
+        ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1)
         : "—";
     return { ...movie, avg, count: scores.length };
   });
