@@ -1,6 +1,12 @@
 import { createClient } from "@/lib/supabaseClient";
 import Link from "next/link";
 
+// Without this, Next.js would "bake in" whatever the database looked
+// like at build time and serve that same snapshot to everyone until
+// the next deploy. This forces it to check the database fresh every
+// time someone visits the page.
+export const dynamic = "force-dynamic";
+
 // This runs on the server each time the page loads, fetching the
 // current list of movies and their ratings straight from Supabase.
 async function getMovies() {
