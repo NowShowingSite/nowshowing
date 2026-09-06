@@ -1,5 +1,6 @@
 import "./globals.css";
 import Link from "next/link";
+import AuthStatus from "@/components/AuthStatus";
 
 export const metadata = {
   title: "Now Showing",
@@ -18,9 +19,7 @@ export default function RootLayout({
           <Link href="/" className="site-logo">
             Now Showing
           </Link>
-          <Link href="/login" className="login-link">
-            Login
-          </Link>
+          <AuthStatus />
         </header>
         <main>{children}</main>
       </body>
