@@ -1,6 +1,10 @@
 import { createClient } from "@/lib/supabaseClient";
 import RatingForm from "@/components/RatingForm";
 
+// Same fix as the home page -- always check the database fresh,
+// never serve a stale snapshot from build time.
+export const dynamic = "force-dynamic";
+
 async function getMovie(slug: string) {
   const supabase = createClient();
   const { data } = await supabase
@@ -35,6 +39,17 @@ export default async function MovieDetailPage({
       <ul>
         {movie.ratings.map((r: any, i: number) => (
           <li key={i}>
+            {r.profiles?.username ?? "someone"}: {r.score}
+          </li>
+        ))}
+      </ul>
+
+      {/* This is a client component -- it needs to know who's
+          logged in and handle the form submission interactively. */}
+      <RatingForm movieId={movie.id} />
+    </div>
+  );
+}          <li key={i}>
             {r.profiles?.username ?? "someone"}: {r.score}
           </li>
         ))}
