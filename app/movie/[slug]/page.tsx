@@ -7,12 +7,12 @@ export const dynamic = "force-dynamic";
 
 async function getMovie(slug: string) {
   const supabase = createClient();
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("movies")
     .select("id, title, year, genre, director, runtime, ratings(score, profiles(username))")
     .eq("slug", slug)
     .single();
-  return data;
+  return { movie: data, error: error?.message ?? null };
 }
 
 export default async function MovieDetailPage({
@@ -20,8 +20,11 @@ export default async function MovieDetailPage({
 }: {
   params: { slug: string };
 }) {
-  const movie = await getMovie(params.slug);
+  const { movie, error } = await getMovie(params.slug);
 
+  if (error) {
+    return <p style={{ padding: 24, color: "salmon" }}>Error loading movie: {error}</p>;
+  }
   if (!movie) return <p style={{ padding: 24 }}>Movie not found.</p>;
 
   return (
@@ -35,6 +38,11 @@ export default async function MovieDetailPage({
       <p>Director: {movie.director}</p>
 
       <h3>Ratings</h3>
+      {/* Temporary debug line -- shows exactly what came back from the
+          database so we can see what's going on. Safe to remove later. */}
+      <p style={{ fontSize: "0.8rem", color: "#888" }}>
+        Debug: movie id = {movie.id}, ratings found = {movie.ratings.length}
+      </p>
       {movie.ratings.length === 0 && <p>No ratings yet — be the first.</p>}
       <ul>
         {movie.ratings.map((r: any, i: number) => (
