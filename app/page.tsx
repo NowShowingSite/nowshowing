@@ -12,12 +12,18 @@ export const dynamic = "force-dynamic";
 async function getMovies() {
   const supabase = createClient();
 
-  const { data: movies } = await supabase
+  const { data: movies, error } = await supabase
     .from("movies")
     .select("id, slug, title, year, ratings(score)")
     .order("title");
 
-  return (movies ?? []).map((movie: any) => {
+  if (error) {
+    // Return the error itself so the page can show exactly what
+    // went wrong, instead of silently displaying "no movies."
+    return { movies: [], error: error.message };
+  }
+
+  const mapped = (movies ?? []).map((movie: any) => {
     const scores = movie.ratings.map((r: any) => r.score);
     const avg =
       scores.length > 0
@@ -25,15 +31,20 @@ async function getMovies() {
         : "—";
     return { ...movie, avg, count: scores.length };
   });
+
+  return { movies: mapped, error: null };
 }
 
 export default async function HomePage() {
-  const movies = await getMovies();
+  const { movies, error } = await getMovies();
 
   return (
     <div className="movie-list">
       <h1>All Movies</h1>
-      {movies.length === 0 && (
+      {error && (
+        <p style={{ color: "salmon" }}>Error loading movies: {error}</p>
+      )}
+      {!error && movies.length === 0 && (
         <p>No movies yet — add some in Supabase's Table Editor to get started.</p>
       )}
       {movies.map((movie: any) => (
