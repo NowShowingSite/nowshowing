@@ -7,26 +7,42 @@ export const dynamic = "force-dynamic";
 
 async function getMovie(slug: string) {
   const supabase = createClient();
-  const { data, error } = await supabase
+
+  const { data: movie, error } = await supabase
     .from("movies")
-    .select("id, title, year, genre, director, runtime, ratings(score, profiles(username))")
+    .select("id, title, year, genre, director, runtime")
     .eq("slug", slug)
     .single();
 
-  // Debug: query ratings directly (no join) to compare against the
-  // nested version above.
-  let rawRatings = null;
-  let rawError = null;
-  if (data) {
-    const result = await supabase
-      .from("ratings")
-      .select("*")
-      .eq("movie_id", data.id);
-    rawRatings = result.data;
-    rawError = result.error?.message ?? null;
+  if (error || !movie) {
+    return { movie: null, error: error?.message ?? null, ratings: [] };
   }
 
-  return { movie: data, error: error?.message ?? null, rawRatings, rawError };
+  // Fetch ratings for this movie on their own (no nested join --
+  // that was silently dropping rows).
+  const { data: ratings } = await supabase
+    .from("ratings")
+    .select("score, user_id")
+    .eq("movie_id", movie.id);
+
+  // Fetch the usernames for whoever left those ratings, then match
+  // them up in plain JavaScript.
+  const userIds = (ratings ?? []).map((r) => r.user_id);
+  let profileMap: Record<string, string> = {};
+  if (userIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id, username")
+      .in("id", userIds);
+    profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.id, p.username]));
+  }
+
+  const mergedRatings = (ratings ?? []).map((r) => ({
+    score: r.score,
+    username: profileMap[r.user_id] ?? "someone",
+  }));
+
+  return { movie, error: null, ratings: mergedRatings };
 }
 
 export default async function MovieDetailPage({
@@ -34,7 +50,7 @@ export default async function MovieDetailPage({
 }: {
   params: { slug: string };
 }) {
-  const { movie, error, rawRatings, rawError } = await getMovie(params.slug);
+  const { movie, error, ratings } = await getMovie(params.slug);
 
   if (error) {
     return <p style={{ padding: 24, color: "salmon" }}>Error loading movie: {error}</p>;
@@ -52,20 +68,11 @@ export default async function MovieDetailPage({
       <p>Director: {movie.director}</p>
 
       <h3>Ratings</h3>
-      {/* Temporary debug lines -- safe to remove later. */}
-      <p style={{ fontSize: "0.8rem", color: "#888" }}>
-        Debug: movie id = {movie.id}, joined ratings found = {movie.ratings.length}
-        <br />
-        Debug (raw, no join): {rawError ? `error: ${rawError}` : `${rawRatings?.length ?? 0} row(s)`}
-        {rawRatings && rawRatings.length > 0 && (
-          <> — {JSON.stringify(rawRatings)}</>
-        )}
-      </p>
-      {movie.ratings.length === 0 && <p>No ratings yet — be the first.</p>}
+      {ratings.length === 0 && <p>No ratings yet — be the first.</p>}
       <ul>
-        {movie.ratings.map((r: any, i: number) => (
+        {ratings.map((r, i) => (
           <li key={i}>
-            {r.profiles?.username ?? "someone"}: {r.score}
+            {r.username}: {r.score}
           </li>
         ))}
       </ul>
