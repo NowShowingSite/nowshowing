@@ -68,9 +68,6 @@ export default async function MovieDetailPage({
       <p>Director: {movie.director}</p>
 
       <h3>Ratings</h3>
-      <p style={{ fontSize: "0.8rem", color: "#888" }}>
-        Debug: rendered at {new Date().toISOString()}, found {ratings.length} rating(s)
-      </p>
       {ratings.length === 0 && <p>No ratings yet — be the first.</p>}
       <ul>
         {ratings.map((r, i) => (
