@@ -503,7 +503,7 @@ h1, h2, h3 {
 .motd-wrap {
   position: absolute;
   top: 18px;
-  left: 20px;
+  left: 24px;
   z-index: 5;
   max-width: 295px;
 }
@@ -662,14 +662,12 @@ h1, h2, h3 {
 /* ---------- Hero / marquee ---------- */
 .hero-wrap {
   position: relative;
-  max-width: 960px;
-  margin: 0 auto;
 }
 
 .movie-count {
   position: absolute;
   top: 18px;
-  right: 20px;
+  right: 24px;
   font-family: 'Space Mono', monospace;
   font-size: 0.7rem;
   letter-spacing: 0.03em;
@@ -688,7 +686,7 @@ h1, h2, h3 {
 .filter-btn-row {
   position: absolute;
   top: 62px;
-  right: 20px;
+  right: 24px;
   display: flex;
   flex-direction: column;
   gap: 8px;
