@@ -104,9 +104,22 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
     return sortByRatingDesc(movies.filter((m) => m.year && Math.floor(m.year / 10) * 10 === decade));
   }
 
-  function goToMovie(slug: string) {
+  async function goToMovie(movie: Movie) {
     setModal(null);
-    router.push(`/movie/${slug}`);
+
+    // Record this the same way clicking a search result does, so it
+    // shows up in Recently Searched afterward.
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase
+        .from("recent_searches")
+        .upsert(
+          { user_id: user.id, movie_id: movie.id, searched_at: new Date().toISOString() },
+          { onConflict: "user_id,movie_id" }
+        );
+    }
+
+    router.push(`/movie/${movie.slug}`);
   }
 
   function handleSurprise() {
@@ -123,7 +136,7 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
       return;
     }
     const pick = candidates[Math.floor(Math.random() * candidates.length)];
-    goToMovie(pick.slug);
+    goToMovie(pick);
   }
 
   function renderMovieList(list: Movie[], emptyText: string) {
@@ -131,7 +144,7 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
     return (
       <div className="modal-movie-list">
         {list.map((m) => (
-          <div key={m.id} className="modal-movie-item" onClick={() => goToMovie(m.slug)}>
+          <div key={m.id} className="modal-movie-item" onClick={() => goToMovie(m)}>
             <span className="modal-movie-title">{m.title}</span>
             <span className="modal-movie-meta">
               <span>{m.year ?? ""}</span>
