@@ -48,6 +48,15 @@ async function getMovies() {
   return { movies: mapped, error: null };
 }
 
+// Red at 0, green at 10, yellow in between -- same scale used everywhere
+// a rating shows up on the site.
+function ratingColor(avgText: string) {
+  const n = parseFloat(avgText);
+  if (isNaN(n)) return "var(--text-muted)";
+  const clamped = Math.max(0, Math.min(10, n));
+  return `hsl(${(clamped / 10) * 120}, 70%, 50%)`;
+}
+
 // Picks a movie for today deterministically -- today's date maps to a
 // fixed index in the (stably-sorted) movie list. This naturally
 // avoids repeating the same movie two days running (as long as there's
@@ -83,7 +92,10 @@ export default async function HomePage() {
                 <span className="motd-label">Movie of the Day</span>
                 <span className="motd-title">{motd.title}</span>
                 <span className="motd-meta">
-                  {motd.year ?? ""} - {motd.count > 0 ? motd.avg : "N/A"}
+                  {motd.year ?? ""} -{" "}
+                  <span style={{ color: motd.count > 0 ? ratingColor(motd.avg) : "var(--text)" }}>
+                    {motd.count > 0 ? motd.avg : "N/A"}
+                  </span>
                 </span>
               </div>
             </Link>
