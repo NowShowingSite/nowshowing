@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabaseClient";
 import Link from "next/link";
 import SearchBar from "@/components/SearchBar";
 import UpcomingReleases from "@/components/UpcomingReleases";
+import MovieBrowser from "@/components/MovieBrowser";
 
 // Without this, Next.js would "bake in" whatever the database looked
 // like at build time and serve that same snapshot to everyone until
@@ -16,7 +17,7 @@ async function getMovies() {
 
   const { data: movies, error } = await supabase
     .from("movies")
-    .select("id, slug, title, year, poster_url")
+    .select("id, slug, title, year, poster_url, genre")
     .order("title");
 
   if (error) {
@@ -83,30 +84,17 @@ export default async function HomePage() {
       )}
       <UpcomingReleases />
       <SearchBar />
-      <div className="movie-list">
-        <h1>All Movies</h1>
-        {error && (
-          <p style={{ color: "salmon" }}>Error loading movies: {error}</p>
-        )}
-        {!error && movies.length === 0 && (
-          <p>No movies yet — add some in Supabase's Table Editor to get started.</p>
-        )}
-        {movies.map((movie: any) => (
-          <Link key={movie.id} href={`/movie/${movie.slug}`} className="movie-row">
-            {movie.poster_url ? (
-              <img src={movie.poster_url} alt="" className="movie-row-poster" />
-            ) : (
-              <div className="movie-row-poster" />
-            )}
-            <div className="movie-row-info">
-              {movie.title} {movie.year ? `(${movie.year})` : ""}
-            </div>
-            <span className="avg-score">
-              {movie.avg} {movie.count > 0 && `(${movie.count})`}
-            </span>
-          </Link>
-        ))}
-      </div>
+      {error && (
+        <p style={{ color: "salmon", padding: "0 24px", maxWidth: 720, margin: "0 auto" }}>
+          Error loading movies: {error}
+        </p>
+      )}
+      {!error && movies.length === 0 && (
+        <p style={{ padding: "0 24px", maxWidth: 720, margin: "0 auto" }}>
+          No movies yet — add some in Supabase's Table Editor to get started.
+        </p>
+      )}
+      {!error && movies.length > 0 && <MovieBrowser movies={movies} />}
     </>
   );
 }

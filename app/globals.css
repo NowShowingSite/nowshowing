@@ -297,6 +297,75 @@ h1, h2, h3 {
   opacity: 0.85;
 }
 
+/* ---------- Browse by Genre / Decade ---------- */
+.browse-buttons {
+  max-width: 720px;
+  margin: 16px auto 0;
+  padding: 0 24px;
+  display: flex;
+  gap: 8px;
+}
+
+.decade-btn {
+  background: none;
+  border: 1px solid var(--divider);
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  padding: 5px 12px;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.decade-btn:hover, .decade-btn.active {
+  color: var(--gold);
+  border-color: var(--gold-dim);
+}
+
+.decade-grid {
+  max-width: 720px;
+  margin: 12px auto 0;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.decade-pill {
+  cursor: pointer;
+  text-align: center;
+  padding: 12px 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--text);
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.decade-pill:hover {
+  border-color: var(--gold-dim);
+  color: var(--gold);
+}
+
+.decade-back {
+  display: inline-block;
+  cursor: pointer;
+  color: var(--text-muted);
+  opacity: 0.75;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  margin-bottom: 14px;
+  transition: color 0.15s ease;
+}
+
+.decade-back:hover {
+  color: var(--gold);
+}
+
 /* ---------- Movie of the Day ---------- */
 .motd-wrap {
   max-width: 720px;
