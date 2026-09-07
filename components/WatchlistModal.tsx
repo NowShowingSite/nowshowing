@@ -124,7 +124,7 @@ export default function WatchlistModal() {
                   aria-label="Add to watchlist"
                   onClick={() => setOpen(false)}
                 >
-                  +
+                  <span className="plus-icon">+</span>
                 </Link>
               </div>
             </div>
