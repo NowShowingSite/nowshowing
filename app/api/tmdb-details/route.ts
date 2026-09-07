@@ -46,7 +46,12 @@ export async function GET(request: NextRequest) {
   );
   const data = await res.json();
 
-  const director = (data.credits?.crew ?? []).find((c: any) => c.job === "Director");
+  // Some movies (like Avengers: Endgame) have co-directors -- grab
+  // everyone credited as "Director," not just the first match.
+  const directors = (data.credits?.crew ?? [])
+    .filter((c: any) => c.job === "Director")
+    .map((c: any) => c.name);
+  const directorNames = directors.join(" & ");
   const genre = (data.genres ?? []).map((g: any) => g.name).join(" / ");
 
   // Prefer an official YouTube trailer; fall back to any YouTube
@@ -74,7 +79,7 @@ export async function GET(request: NextRequest) {
     yearEnd: null,
     releaseDate,
     genre,
-    director: director?.name ?? "",
+    director: directorNames || "",
     runtime: data.runtime ?? null,
     posterUrl: data.poster_path ? `https://image.tmdb.org/t/p/w500${data.poster_path}` : null,
     trailerUrl,
