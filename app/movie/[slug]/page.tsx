@@ -25,22 +25,39 @@ async function getMovie(slug: string) {
     .single();
 
   if (error || !movie) {
-    return { movie: null, error: error?.message ?? null, avg: null };
+    return { movie: null, error: error?.message ?? null, avg: null, adminBreakdown: [] };
   }
 
-  // Just need the scores to compute an average -- no need for
-  // usernames anymore since the per-person breakdown isn't shown.
-  const { data: ratings } = await supabase
-    .from("ratings")
-    .select("score")
-    .eq("movie_id", movie.id);
+  // The site's "official" score is the average of just the admin
+  // accounts (Adam/Alex/Rob) -- everyone else's ratings are tracked
+  // separately and shown elsewhere.
+  const { data: admins } = await supabase
+    .from("profiles")
+    .select("id, username")
+    .eq("is_admin", true)
+    .order("created_at", { ascending: true });
 
-  const avg =
-    ratings && ratings.length > 0
-      ? ratings.reduce((sum, r) => sum + r.score, 0) / ratings.length
-      : null;
+  const adminIds = (admins ?? []).map((a) => a.id);
 
-  return { movie, error: null, avg };
+  let scoreByAdmin: Record<string, number> = {};
+  if (adminIds.length > 0) {
+    const { data: adminRatings } = await supabase
+      .from("ratings")
+      .select("user_id, score")
+      .eq("movie_id", movie.id)
+      .in("user_id", adminIds);
+    scoreByAdmin = Object.fromEntries((adminRatings ?? []).map((r) => [r.user_id, r.score]));
+  }
+
+  const adminBreakdown = (admins ?? []).map((a) => ({
+    username: a.username,
+    score: scoreByAdmin[a.id] ?? null,
+  }));
+
+  const ratedScores = adminBreakdown.filter((a) => a.score !== null).map((a) => a.score as number);
+  const avg = ratedScores.length > 0 ? ratedScores.reduce((sum, s) => sum + s, 0) / ratedScores.length : null;
+
+  return { movie, error: null, avg, adminBreakdown };
 }
 
 export default async function MovieDetailPage({
@@ -48,7 +65,7 @@ export default async function MovieDetailPage({
 }: {
   params: { slug: string };
 }) {
-  const { movie, error, avg } = await getMovie(params.slug);
+  const { movie, error, avg, adminBreakdown } = await getMovie(params.slug);
 
   if (error) {
     return (
@@ -102,10 +119,11 @@ export default async function MovieDetailPage({
             )}
           </div>
           <div className="ticket-info">
-            {/* Clickable rating badge -- click it to enter your score.
-                This is a client component since it needs to know who's
-                logged in and handle the prompt/submit interactively. */}
-            <RatingForm movieId={movie.id} tmdbId={movie.tmdb_id} avg={avg} />
+            {/* Clickable rating badge -- click it to see the Adam/Alex/Rob
+                breakdown, or use the small link below to submit your own
+                score. This is a client component since it needs to know
+                who's logged in. */}
+            <RatingForm movieId={movie.id} tmdbId={movie.tmdb_id} avg={avg} adminBreakdown={adminBreakdown} />
 
             <h1 className="detail-title">{movie.title}</h1>
             <div className="meta-line">

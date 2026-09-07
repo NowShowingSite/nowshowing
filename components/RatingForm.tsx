@@ -11,19 +11,25 @@ function ratingColor(score: number | null) {
   return `hsl(${(clamped / 10) * 120}, 70%, 50%)`;
 }
 
+type AdminScore = { username: string; score: number | null };
+
 export default function RatingForm({
   movieId,
   tmdbId,
   avg,
+  adminBreakdown,
 }: {
   movieId: string;
   tmdbId?: number | null;
   avg: number | null;
+  adminBreakdown: AdminScore[];
 }) {
   const supabase = createClient();
   const router = useRouter();
 
-  const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+
+  const [rateOpen, setRateOpen] = useState(false);
   const [needsLogin, setNeedsLogin] = useState(false);
   const [scoreInput, setScoreInput] = useState("");
   const [error, setError] = useState("");
@@ -33,12 +39,12 @@ export default function RatingForm({
   const avgText = hasRating ? avg!.toFixed(1) : "N/A";
   const badgeColor = hasRating ? ratingColor(avg) : "var(--text-muted)";
 
-  async function handleOpen() {
+  async function handleOpenRate() {
     setError("");
     setScoreInput("");
     const { data: { user } } = await supabase.auth.getUser();
     setNeedsLogin(!user);
-    setOpen(true);
+    setRateOpen(true);
   }
 
   async function handleSubmit() {
@@ -78,34 +84,56 @@ export default function RatingForm({
     }
 
     setSubmitting(false);
-    setOpen(false);
+    setRateOpen(false);
     // The page's rating data is fetched server-side and won't know
     // about this new rating on its own -- this re-runs that fetch.
     router.refresh();
   }
 
   return (
-    <div className="rating-row">
-      <div
-        className="rating-badge rating-badge-clickable"
-        style={{ borderColor: badgeColor }}
-        onClick={handleOpen}
-      >
-        <span className="num" style={{ color: badgeColor }}>{avgText}</span>
-        <span className={`out${hasRating ? "" : " out-small"}`}>
-          {hasRating ? "OUT OF 10" : (
-            <>NOT YET<br />RATED</>
-          )}
-        </span>
+    <div>
+      <div className="rating-row">
+        <div
+          className="rating-badge rating-badge-clickable"
+          style={{ borderColor: badgeColor }}
+          onClick={() => setExpanded((e) => !e)}
+        >
+          <span className="num" style={{ color: badgeColor }}>{avgText}</span>
+          <span className={`out${hasRating ? "" : " out-small"}`}>
+            {hasRating ? "OUT OF 10" : (
+              <>NOT YET<br />RATED</>
+            )}
+          </span>
+        </div>
+        {hasRating && avg === 10 && (
+          <div className="perfect-score">Perfect<br />Score</div>
+        )}
       </div>
-      {hasRating && avg === 10 && (
-        <div className="perfect-score">Perfect<br />Score</div>
+
+      {expanded && (
+        <div className="inline-breakdown">
+          {adminBreakdown.map((a) => {
+            const color = a.score !== null ? ratingColor(a.score) : "var(--text-muted)";
+            return (
+              <div key={a.username} className="inline-score-item">
+                <div className="inline-score-badge" style={{ borderColor: color, color }}>
+                  {a.score !== null ? a.score.toFixed(1) : "N/A"}
+                </div>
+                <span className="inline-score-name">{a.username}</span>
+              </div>
+            );
+          })}
+        </div>
       )}
 
-      {open && (
-        <div className="modal-overlay" onClick={() => setOpen(false)}>
+      <span className="rate-your-score-link" onClick={handleOpenRate}>
+        Rate this movie
+      </span>
+
+      {rateOpen && (
+        <div className="modal-overlay" onClick={() => setRateOpen(false)}>
           <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" aria-label="Close" onClick={() => setOpen(false)}>
+            <button className="modal-close" aria-label="Close" onClick={() => setRateOpen(false)}>
               &times;
             </button>
 
