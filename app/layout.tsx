@@ -1,5 +1,4 @@
 import "./globals.css";
-import Link from "next/link";
 import AuthStatus from "@/components/AuthStatus";
 
 export const metadata = {
@@ -16,9 +15,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <header className="site-header">
-          <Link href="/" className="site-logo">
-            Now Showing
-          </Link>
+          <div />
           <AuthStatus />
         </header>
         <main>{children}</main>
