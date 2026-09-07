@@ -1102,7 +1102,7 @@ h1, h2, h3 {
 
 .filter-btn-row {
   position: absolute;
-  top: 62px;
+  top: 78px;
   right: 24px;
   display: flex;
   flex-direction: column;
@@ -1112,7 +1112,7 @@ h1, h2, h3 {
 }
 
 .filter-btn-row .surprise-btn {
-  margin-top: 6px;
+  margin-top: 14px;
 }
 
 .marquee-wrap {
