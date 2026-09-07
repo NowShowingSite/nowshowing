@@ -6,6 +6,22 @@ import RatingForm from "@/components/RatingForm";
 // never serve a stale snapshot from build time.
 export const dynamic = "force-dynamic";
 
+// Runtime is stored in minutes -- format as "1h 40m" instead of "100m".
+function formatRuntime(minutes: number | null) {
+  if (typeof minutes !== "number") return "";
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+
+// Red at 0, green at 10, yellow in between -- used for every score
+// shown on this page (the average badge and each individual rating).
+function ratingColor(score: number | null) {
+  if (score === null || isNaN(score)) return "var(--text-muted)";
+  const clamped = Math.max(0, Math.min(10, score));
+  return `hsl(${(clamped / 10) * 120}, 70%, 50%)`;
+}
+
 async function getMovie(slug: string) {
   const supabase = createClient();
 
@@ -82,9 +98,7 @@ export default async function MovieDetailPage({
   const avgText = hasRating ? avg!.toFixed(1) : "N/A";
 
   // Red at 0, green at 10 -- same scale used for individual scores.
-  const badgeColor = hasRating
-    ? `hsl(${(Math.max(0, Math.min(10, avg!)) / 10) * 120}, 70%, 50%)`
-    : "var(--text-muted)";
+  const badgeColor = hasRating ? ratingColor(avg) : "var(--text-muted)";
 
   return (
     <div className="detail-wrap">
@@ -131,12 +145,11 @@ export default async function MovieDetailPage({
               )}
             </div>
 
-            <h1 className="detail-title">
-              {movie.title} {movie.year ? `(${movie.year})` : ""}
-            </h1>
+            <h1 className="detail-title">{movie.title}</h1>
             <div className="meta-line">
+              <span className="meta-year">{movie.year}</span>
               <span>{movie.genre}</span>
-              {movie.runtime && <span className="meta-runtime">{movie.runtime}m</span>}
+              {movie.runtime && <span className="meta-runtime">{formatRuntime(movie.runtime)}</span>}
             </div>
             <p className="meta-director">
               Director:{" "}
@@ -155,7 +168,7 @@ export default async function MovieDetailPage({
               {ratings.map((r, i) => (
                 <li key={i}>
                   <span>{r.username}</span>
-                  <span style={{ color: "var(--gold)" }}>{r.score}</span>
+                  <span style={{ color: ratingColor(r.score) }}>{r.score}</span>
                 </li>
               ))}
             </ul>

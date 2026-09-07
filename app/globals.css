@@ -207,6 +207,7 @@ h1, h2, h3 {
   margin-bottom: 16px;
 }
 
+.meta-year,
 .meta-runtime {
   white-space: nowrap;
 }
@@ -435,7 +436,7 @@ h1, h2, h3 {
 }
 
 .stub-body {
-  padding: 8px 6px 26px;
+  padding: 8px 6px 18px;
 }
 
 .stub-title {
@@ -447,7 +448,6 @@ h1, h2, h3 {
   -webkit-box-orient: vertical;
   overflow: hidden;
   line-height: 1.2;
-  min-height: 2.4em;
 }
 
 .stub-meta {
@@ -459,12 +459,11 @@ h1, h2, h3 {
 
 .stub-rating {
   position: absolute;
-  bottom: 8px;
+  bottom: 6px;
   right: 8px;
   font-family: 'Space Mono', monospace;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  color: var(--gold);
 }
 
 /* ---------- Modal ---------- */

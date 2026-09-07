@@ -302,7 +302,11 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
                 <p className="stub-title">{movie.title}</p>
                 <span className="stub-meta">{movie.year ?? ""}</span>
               </div>
-              {movie.count > 0 && <span className="stub-rating">{movie.avg}</span>}
+              {movie.count > 0 && (
+                <span className="stub-rating" style={{ color: ratingColor(movie.avg) }}>
+                  {movie.avg}
+                </span>
+              )}
             </Link>
           ))}
         </div>
