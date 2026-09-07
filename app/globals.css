@@ -1004,7 +1004,7 @@ h1, h2, h3 {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 8px;
+  gap: 4px;
 }
 
 .motd-label {
