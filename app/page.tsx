@@ -91,12 +91,12 @@ export default async function HomePage() {
       <div className="hero-wrap">
         {motd && (
           <div className="motd-wrap">
+            <span className="motd-label">Movie of the Day</span>
             <Link href={`/movie/${motd.slug}`} className="motd-box">
               <div className="motd-poster">
                 {motd.poster_url && <img src={motd.poster_url} alt="" />}
               </div>
               <div className="motd-text">
-                <span className="motd-label">Movie of the Day</span>
                 <span className="motd-title">{motd.title}</span>
                 <span className="motd-meta">
                   {motd.year ?? ""} -{" "}
