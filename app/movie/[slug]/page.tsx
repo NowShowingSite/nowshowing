@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabaseClient";
 import Link from "next/link";
 import RatingForm from "@/components/RatingForm";
+import DirectorLink from "@/components/DirectorLink";
 
 // Same fix as the home page -- always check the database fresh,
 // never serve a stale snapshot from build time.
@@ -115,9 +116,7 @@ export default async function MovieDetailPage({
             <p className="meta-director">
               Director:{" "}
               {movie.director ? (
-                <Link href={`/director/${encodeURIComponent(movie.director)}`} className="director-link">
-                  {movie.director}
-                </Link>
+                <DirectorLink name={movie.director} currentSlug={params.slug} />
               ) : (
                 "Unknown"
               )}
