@@ -98,20 +98,20 @@ export default async function HomePage() {
           <p className="site-tagline">Ratings from people whose opinions actually matter</p>
           <UpcomingReleases />
         </div>
-      </div>
 
-      <SearchBar />
-      {error && (
-        <p style={{ color: "salmon", padding: "0 24px", maxWidth: 720, margin: "0 auto" }}>
-          Error loading movies: {error}
-        </p>
-      )}
-      {!error && movies.length === 0 && (
-        <p style={{ padding: "0 24px", maxWidth: 720, margin: "0 auto" }}>
-          No movies yet — add some in Supabase's Table Editor to get started.
-        </p>
-      )}
-      {!error && movies.length > 0 && <MovieBrowser movies={movies} />}
+        <SearchBar />
+        {error && (
+          <p style={{ color: "salmon", padding: "0 24px", maxWidth: 720, margin: "0 auto" }}>
+            Error loading movies: {error}
+          </p>
+        )}
+        {!error && movies.length === 0 && (
+          <p style={{ padding: "0 24px", maxWidth: 720, margin: "0 auto" }}>
+            No movies yet — add some in Supabase's Table Editor to get started.
+          </p>
+        )}
+        {!error && movies.length > 0 && <MovieBrowser movies={movies} />}
+      </div>
     </>
   );
 }
