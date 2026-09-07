@@ -47,6 +47,9 @@ export default function WatchlistPage() {
   if (!loggedIn) {
     return (
       <div className="movie-list">
+        <Link href="/" className="back-link">
+          ← Back to search
+        </Link>
         <p>You need to log in to see your watchlist.</p>
       </div>
     );
@@ -54,6 +57,9 @@ export default function WatchlistPage() {
 
   return (
     <div className="movie-list">
+      <Link href="/" className="back-link">
+        ← Back to search
+      </Link>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1>My Watchlist</h1>
         <Link href="/watchlist/add" className="login-link">

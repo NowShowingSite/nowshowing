@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
 
@@ -69,6 +70,9 @@ export default function AddToWatchlistPage() {
   if (!loggedIn) {
     return (
       <div className="movie-list">
+        <Link href="/" className="back-link">
+          ← Back to search
+        </Link>
         <p>You need to log in to add movies to your watchlist.</p>
       </div>
     );
@@ -76,6 +80,9 @@ export default function AddToWatchlistPage() {
 
   return (
     <div className="movie-list">
+      <Link href="/watchlist" className="back-link">
+        ← Back to Watchlist
+      </Link>
       <h1>Add to Watchlist</h1>
       <div className="rating-form">
         <input

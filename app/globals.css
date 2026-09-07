@@ -782,6 +782,31 @@ h1, h2, h3 {
   cursor: default;
 }
 
+.detail-wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 50px 24px 100px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  opacity: 0.75;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.82rem;
+  letter-spacing: 0.05em;
+  margin-bottom: 34px;
+  cursor: pointer;
+  transition: color 0.15s ease, opacity 0.15s ease;
+}
+
+.back-link:hover {
+  color: var(--gold);
+  opacity: 1;
+}
+
 /* ---------- Hero / marquee ---------- */
 .hero-wrap {
   position: relative;

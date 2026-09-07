@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
 
@@ -55,6 +56,9 @@ export default function LoginPage() {
 
   return (
     <div className="login-box">
+      <Link href="/" className="back-link">
+        ← Back to search
+      </Link>
       <h2>Login / Sign up</h2>
       <input
         type="email"

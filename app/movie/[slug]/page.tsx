@@ -54,9 +54,25 @@ export default async function MovieDetailPage({
   const { movie, error, ratings } = await getMovie(params.slug);
 
   if (error) {
-    return <p style={{ padding: 24, color: "salmon" }}>Error loading movie: {error}</p>;
+    return (
+      <div className="detail-wrap">
+        <Link href="/" className="back-link">
+          ← Back to search
+        </Link>
+        <p style={{ color: "salmon" }}>Error loading movie: {error}</p>
+      </div>
+    );
   }
-  if (!movie) return <p style={{ padding: 24 }}>Movie not found.</p>;
+  if (!movie) {
+    return (
+      <div className="detail-wrap">
+        <Link href="/" className="back-link">
+          ← Back to search
+        </Link>
+        <p>Movie not found.</p>
+      </div>
+    );
+  }
 
   const avg =
     ratings.length > 0
@@ -64,7 +80,10 @@ export default async function MovieDetailPage({
       : null;
 
   return (
-    <div className="movie-list">
+    <div className="detail-wrap">
+      <Link href="/" className="back-link">
+        ← Back to search
+      </Link>
       <div className="ticket">
         {movie.collections && movie.collections.length > 0 && (
           <div className="collection-badge-stack">

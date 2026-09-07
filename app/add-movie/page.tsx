@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
 
@@ -94,6 +95,9 @@ export default function AddMoviePage() {
   if (!isAdmin) {
     return (
       <div className="movie-list">
+        <Link href="/" className="back-link">
+          ← Back to search
+        </Link>
         <p>You don't have access to this page.</p>
       </div>
     );
@@ -101,6 +105,9 @@ export default function AddMoviePage() {
 
   return (
     <div className="movie-list">
+      <Link href="/" className="back-link">
+        ← Back to search
+      </Link>
       <h1>Add a Movie</h1>
       <div className="rating-form">
         <input
