@@ -75,6 +75,7 @@ export default function AddMoviePage() {
       director: details.director,
       runtime: details.runtime,
       poster_url: details.posterUrl,
+      trailer_url: details.trailerUrl,
       tmdb_id: tmdbId,
       collections: collections.length > 0 ? collections : null,
     });

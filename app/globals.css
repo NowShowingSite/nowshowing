@@ -208,6 +208,11 @@ h1, h2, h3 {
     width: 140px;
     margin: 0 auto;
   }
+  .poster-col {
+    width: 140px;
+    flex-basis: auto;
+    margin: 0 auto;
+  }
 }
 
 /* ---------- Rating badge (average score circle) ---------- */
@@ -364,6 +369,37 @@ h1, h2, h3 {
 
 .decade-back:hover {
   color: var(--gold);
+}
+
+.poster-col {
+  flex: 0 0 180px;
+  width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.trailer-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--gold-dim);
+  border-radius: 20px;
+  padding: 7px 0;
+  color: var(--gold);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  cursor: pointer;
+  background: none;
+  transition: border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.trailer-btn:hover {
+  border-color: var(--gold);
+  opacity: 0.85;
 }
 
 /* ---------- Collection badges ---------- */

@@ -11,7 +11,7 @@ async function getMovie(slug: string) {
 
   const { data: movie, error } = await supabase
     .from("movies")
-    .select("id, title, year, genre, director, runtime, poster_url, tmdb_id, collections")
+    .select("id, title, year, genre, director, runtime, poster_url, tmdb_id, collections, trailer_url")
     .eq("slug", slug)
     .single();
 
@@ -76,9 +76,23 @@ export default async function MovieDetailPage({
           </div>
         )}
         {movie.poster_url ? (
-          <img src={movie.poster_url} alt="" className="ticket-poster" />
+          <div className="poster-col">
+            <img src={movie.poster_url} alt="" className="ticket-poster" />
+            {movie.trailer_url && (
+              <a href={movie.trailer_url} target="_blank" rel="noopener noreferrer" className="trailer-btn">
+                ▶ Trailer
+              </a>
+            )}
+          </div>
         ) : (
-          <div className="ticket-poster" />
+          <div className="poster-col">
+            <div className="ticket-poster" />
+            {movie.trailer_url && (
+              <a href={movie.trailer_url} target="_blank" rel="noopener noreferrer" className="trailer-btn">
+                ▶ Trailer
+              </a>
+            )}
+          </div>
         )}
         <div className="ticket-info">
           {avg && (

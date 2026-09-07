@@ -7,12 +7,20 @@ export async function GET(request: NextRequest) {
   }
 
   const res = await fetch(
-    `https://api.themoviedb.org/3/movie/${tmdbId}?append_to_response=credits,release_dates&api_key=${process.env.TMDB_API_KEY}`
+    `https://api.themoviedb.org/3/movie/${tmdbId}?append_to_response=credits,release_dates,videos&api_key=${process.env.TMDB_API_KEY}`
   );
   const data = await res.json();
 
   const director = (data.credits?.crew ?? []).find((c: any) => c.job === "Director");
   const genre = (data.genres ?? []).map((g: any) => g.name).join(" / ");
+
+  // Prefer an official YouTube trailer; fall back to any YouTube
+  // trailer if there's no "official" flag set.
+  const videos = data.videos?.results ?? [];
+  const trailer =
+    videos.find((v: any) => v.site === "YouTube" && v.type === "Trailer" && v.official) ??
+    videos.find((v: any) => v.site === "YouTube" && v.type === "Trailer");
+  const trailerUrl = trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : null;
 
   // TMDB's top-level "release_date" is whichever country released it
   // FIRST globally, not necessarily the US date. Look up the US entry
@@ -33,5 +41,6 @@ export async function GET(request: NextRequest) {
     director: director?.name ?? "",
     runtime: data.runtime ?? null,
     posterUrl: data.poster_path ? `https://image.tmdb.org/t/p/w500${data.poster_path}` : null,
+    trailerUrl,
   });
 }
