@@ -47,11 +47,40 @@ async function getMovies() {
   return { movies: mapped, error: null };
 }
 
+// Picks a movie for today deterministically -- today's date maps to a
+// fixed index in the (stably-sorted) movie list. This naturally
+// avoids repeating the same movie two days running (as long as there's
+// more than one movie) without needing any cooldown/history tracking,
+// which is what caused a repeat bug on the old static version.
+function pickMovieOfTheDay(movies: any[]) {
+  if (movies.length === 0) return null;
+  const sorted = [...movies].sort((a, b) => a.id.localeCompare(b.id));
+  const daysSinceEpoch = Math.floor(Date.now() / 86400000);
+  const index = daysSinceEpoch % sorted.length;
+  return sorted[index];
+}
+
 export default async function HomePage() {
   const { movies, error } = await getMovies();
+  const motd = pickMovieOfTheDay(movies);
 
   return (
     <>
+      {motd && (
+        <div className="motd-wrap">
+          <Link href={`/movie/${motd.slug}`} className="motd-box">
+            <div className="motd-poster">
+              {motd.poster_url && <img src={motd.poster_url} alt="" />}
+            </div>
+            <div className="motd-text">
+              <span className="motd-label">Movie of the Day</span>
+              <span className="motd-title">
+                {motd.title} {motd.year ? `(${motd.year})` : ""}
+              </span>
+            </div>
+          </Link>
+        </div>
+      )}
       <UpcomingReleases />
       <SearchBar />
       <div className="movie-list">
