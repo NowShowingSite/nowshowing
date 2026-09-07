@@ -97,15 +97,13 @@ export default async function HomePage() {
               </div>
               <div className="motd-text">
                 <span className="motd-label">Movie of the Day</span>
-                <div className="motd-title-wrap">
-                  <span className="motd-title">{motd.title}</span>
-                  <span className="motd-meta">
-                    {motd.year ?? ""} -{" "}
-                    <span style={{ color: motd.count > 0 ? ratingColor(motd.avg) : "var(--text)" }}>
-                      {motd.count > 0 ? motd.avg : "N/A"}
-                    </span>
+                <span className="motd-title">{motd.title}</span>
+                <span className="motd-meta">
+                  {motd.year ?? ""} -{" "}
+                  <span style={{ color: motd.count > 0 ? ratingColor(motd.avg) : "var(--text)" }}>
+                    {motd.count > 0 ? motd.avg : "N/A"}
                   </span>
-                </div>
+                </span>
               </div>
             </Link>
           </div>
