@@ -53,7 +53,7 @@ export default function AuthStatus() {
         </Link>
         {isAdmin && (
           <Link href="/add-movie" className="login-link">
-            Add Movie
+            Add Movie/TV
           </Link>
         )}
         <span
