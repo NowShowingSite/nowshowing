@@ -110,12 +110,10 @@ export default async function HomePage() {
         )}
 
         <div className="movie-count">
-          <div>
-            Total Movie Count: <CountLink movies={movies} mediaType="movie" count={movieCount} />
-          </div>
-          <div>
-            Total TV Count: <CountLink movies={movies} mediaType="tv" count={tvCount} />
-          </div>
+          <span className="count-label">Total Movie Count:</span>
+          <CountLink movies={movies} mediaType="movie" count={movieCount} />
+          <span className="count-label">Total TV Count:</span>
+          <CountLink movies={movies} mediaType="tv" count={tvCount} />
         </div>
 
         <div className="marquee-wrap">

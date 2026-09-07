@@ -1166,8 +1166,15 @@ h1, h2, h3 {
   letter-spacing: 0.03em;
   color: var(--text);
   z-index: 5;
-  text-align: left;
-  line-height: 1.6;
+  display: grid;
+  grid-template-columns: auto auto;
+  column-gap: 6px;
+  row-gap: 2px;
+  align-items: baseline;
+}
+
+.count-label {
+  white-space: nowrap;
 }
 
 .movie-count .count-num {
