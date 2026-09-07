@@ -14,6 +14,7 @@ export default function SearchBar() {
   const [allMovies, setAllMovies] = useState<MovieOption[]>([]);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const [highlighted, setHighlighted] = useState(0);
 
   // Load the movie list once -- the dataset is small enough that
   // filtering it in the browser as you type is instant, same as the
@@ -61,6 +62,23 @@ export default function SearchBar() {
     router.push(`/movie/${movie.slug}`);
   }
 
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (!open || results.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlighted((i) => (i + 1) % results.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlighted((i) => (i - 1 + results.length) % results.length);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      goToMovie(results[highlighted]);
+    } else if (e.key === "Escape") {
+      setOpen(false);
+    }
+  }
+
   return (
     <div className="search-section" ref={boxRef}>
       <div className="search-box">
@@ -71,14 +89,21 @@ export default function SearchBar() {
           onChange={(e) => {
             setQuery(e.target.value);
             setOpen(true);
+            setHighlighted(0);
           }}
           onFocus={() => setOpen(true)}
+          onKeyDown={handleKeyDown}
         />
         {open && q && (
           <div className="dropdown">
             {results.length === 0 && <div className="dropdown-empty">No matches found.</div>}
-            {results.map((m) => (
-              <div key={m.slug} className="dropdown-item" onClick={() => goToMovie(m)}>
+            {results.map((m, i) => (
+              <div
+                key={m.slug}
+                className={`dropdown-item${i === highlighted ? " active" : ""}`}
+                onClick={() => goToMovie(m)}
+                onMouseEnter={() => setHighlighted(i)}
+              >
                 <div className="d-thumb">
                   {m.poster_url && <img src={m.poster_url} alt="" />}
                 </div>
