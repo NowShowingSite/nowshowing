@@ -687,6 +687,7 @@ h1, h2, h3 {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  position: relative;
 }
 
 .trailer-btn {
@@ -712,6 +713,11 @@ h1, h2, h3 {
 }
 
 .change-poster-btn {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
