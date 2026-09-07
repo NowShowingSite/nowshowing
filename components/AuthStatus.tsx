@@ -56,7 +56,17 @@ export default function AuthStatus() {
             Add Movie
           </Link>
         )}
-        <span style={{ color: "#a9a6a0" }}>Logged in as {email}</span>
+        <span
+          style={{
+            color: "var(--text-muted)",
+            opacity: 0.75,
+            fontFamily: "'Space Mono', monospace",
+            fontSize: "0.7rem",
+            letterSpacing: "0.03em",
+          }}
+        >
+          Logged in as {email}
+        </span>
         <button onClick={handleLogout} className="login-link" style={{ cursor: "pointer" }}>
           Log out
         </button>

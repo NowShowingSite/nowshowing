@@ -39,7 +39,7 @@ a {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 24px;
+  padding: 8px 24px;
   border-bottom: 1px solid var(--divider);
 }
 
@@ -55,11 +55,11 @@ a {
   color: var(--text-muted);
   opacity: 0.75;
   border: 1px solid var(--gold-dim);
-  padding: 6px 14px;
+  padding: 5px 12px;
   border-radius: 20px;
   font-family: 'Space Mono', monospace;
-  font-size: 0.75rem;
-  letter-spacing: 0.05em;
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
   background: none;
   cursor: pointer;
   transition: border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
