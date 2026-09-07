@@ -52,8 +52,7 @@ a {
 }
 
 .login-link {
-  color: var(--text-muted);
-  opacity: 0.75;
+  color: var(--text);
   border: 1px solid var(--gold-dim);
   padding: 5px 12px;
   border-radius: 20px;
@@ -166,8 +165,7 @@ h1, h2, h3 {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-muted);
-  opacity: 0.75;
+  color: var(--text);
   font-family: 'Space Mono', monospace;
   font-size: 0.75rem;
   text-align: center;
@@ -197,8 +195,7 @@ h1, h2, h3 {
 }
 
 .meta-line {
-  color: var(--text-muted);
-  opacity: 0.75;
+  color: var(--text);
   font-family: 'Space Mono', monospace;
   font-size: 0.88rem;
   line-height: 1.6;
@@ -216,7 +213,7 @@ h1, h2, h3 {
 }
 
 .meta-director {
-  color: rgba(242, 239, 232, 0.75);
+  color: var(--text);
   font-family: 'Space Mono', monospace;
   font-size: 0.88rem;
   margin: 0;
@@ -274,8 +271,7 @@ h1, h2, h3 {
 .inline-score-name {
   font-family: 'Space Mono', monospace;
   font-size: 0.62rem;
-  color: var(--text-muted);
-  opacity: 0.75;
+  color: var(--text);
   letter-spacing: 0.03em;
 }
 
@@ -288,8 +284,7 @@ h1, h2, h3 {
 .rate-your-score-link {
   display: inline-block;
   margin-top: 10px;
-  color: var(--text-muted);
-  opacity: 0.75;
+  color: var(--text);
   font-family: 'Space Mono', monospace;
   font-size: 0.75rem;
   text-decoration: underline;
@@ -345,8 +340,7 @@ h1, h2, h3 {
 
 .rating-badge .out {
   font-size: 0.65rem;
-  color: var(--text-muted);
-  opacity: 0.7;
+  color: var(--text);
   letter-spacing: 0.1em;
   margin-top: 2px;
   font-family: 'Space Mono', monospace;
@@ -405,7 +399,6 @@ h1, h2, h3 {
 
 .rating-form button:hover {
   border-color: var(--gold);
-  opacity: 0.85;
 }
 
 .clear-recents-btn {
@@ -415,8 +408,7 @@ h1, h2, h3 {
   font-family: 'Space Mono', monospace;
   font-size: 0.7rem;
   letter-spacing: 0.03em;
-  color: var(--text-muted);
-  opacity: 0.75;
+  color: var(--text);
   padding: 2px 0;
   transition: color 0.15s ease, opacity 0.15s ease;
 }
@@ -445,7 +437,7 @@ h1, h2, h3 {
   font-family: 'Bebas Neue', sans-serif;
   letter-spacing: 0.08em;
   font-size: 1.3rem;
-  color: var(--text-muted);
+  color: var(--text);
   margin: 0;
 }
 
@@ -514,8 +506,7 @@ h1, h2, h3 {
 }
 
 .stub-meta {
-  color: var(--text-muted);
-  opacity: 0.75;
+  color: var(--text);
   font-size: 0.64rem;
   font-family: 'Space Mono', monospace;
 }
@@ -560,8 +551,7 @@ h1, h2, h3 {
   right: 14px;
   background: none;
   border: none;
-  color: var(--text-muted);
-  opacity: 0.75;
+  color: var(--text);
   font-size: 1.2rem;
   cursor: pointer;
   line-height: 1;
@@ -584,8 +574,7 @@ h1, h2, h3 {
 .modal-subtitle {
   font-family: 'Space Mono', monospace;
   font-size: 0.78rem;
-  color: var(--text-muted);
-  opacity: 0.75;
+  color: var(--text);
   margin: 0 0 18px;
 }
 
@@ -620,7 +609,7 @@ h1, h2, h3 {
 .modal-movie-meta {
   font-family: 'Space Mono', monospace;
   font-size: 0.78rem;
-  color: var(--text-muted);
+  color: var(--text);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -628,8 +617,7 @@ h1, h2, h3 {
 }
 
 .modal-empty {
-  color: var(--text-muted);
-  opacity: 0.75;
+  color: var(--text);
   font-size: 0.9rem;
 }
 
@@ -642,7 +630,7 @@ h1, h2, h3 {
   font-family: 'Space Mono', monospace;
   font-size: 0.7rem;
   letter-spacing: 0.03em;
-  color: var(--text-muted);
+  color: var(--text);
   padding: 5px 12px;
   transition: border-color 0.15s ease, color 0.15s ease;
 }
@@ -682,8 +670,7 @@ h1, h2, h3 {
 .decade-back {
   display: inline-block;
   cursor: pointer;
-  color: var(--text-muted);
-  opacity: 0.75;
+  color: var(--text);
   font-family: 'Space Mono', monospace;
   font-size: 0.72rem;
   margin-bottom: 14px;
@@ -722,7 +709,6 @@ h1, h2, h3 {
 
 .trailer-btn:hover {
   border-color: var(--gold);
-  opacity: 0.85;
 }
 
 .watchlist-toggle-btn {
@@ -734,8 +720,7 @@ h1, h2, h3 {
   border-radius: 50%;
   border: 1px solid var(--gold-dim);
   background: var(--surface);
-  color: var(--text-muted);
-  opacity: 0.7;
+  color: var(--text);
   font-family: 'Space Mono', monospace;
   font-size: 0.95rem;
   line-height: 1;
@@ -784,8 +769,7 @@ h1, h2, h3 {
   cursor: pointer;
   font-family: 'Space Mono', monospace;
   font-size: 0.7rem;
-  color: var(--text-muted);
-  opacity: 0.85;
+  color: var(--text);
   background: var(--surface);
   border: 1px solid var(--divider);
   border-radius: 20px;
@@ -822,8 +806,7 @@ h1, h2, h3 {
   display: block;
   font-family: 'Space Mono', monospace;
   font-size: 0.7rem;
-  color: var(--text-muted);
-  opacity: 0.75;
+  color: var(--text);
   margin-bottom: 6px;
 }
 
@@ -854,7 +837,6 @@ h1, h2, h3 {
 }
 
 .surprise-go-btn:hover {
-  opacity: 0.88;
 }
 
 /* ---------- Movie of the Day ---------- */
@@ -894,7 +876,7 @@ h1, h2, h3 {
   font-family: 'Space Mono', monospace;
   font-size: 0.87rem;
   line-height: 1.55;
-  color: var(--text-muted);
+  color: var(--text);
   text-align: left;
 }
 
@@ -938,8 +920,7 @@ h1, h2, h3 {
   font-family: 'Space Mono', monospace;
   font-size: 0.72rem;
   letter-spacing: 0.05em;
-  color: var(--text-muted);
-  opacity: 0.6;
+  color: var(--text);
   margin: 0;
   text-align: center;
 }
@@ -948,7 +929,7 @@ h1, h2, h3 {
   font-family: 'Space Mono', monospace;
   font-size: 0.72rem;
   letter-spacing: 0.05em;
-  color: var(--text-muted);
+  color: var(--text);
   margin: 0;
   display: flex;
   align-items: baseline;
@@ -989,7 +970,7 @@ h1, h2, h3 {
   transform: translateY(-50%);
   background: none;
   border: 1px solid var(--gold-dim);
-  color: var(--text-muted);
+  color: var(--text);
   width: 26px;
   height: 26px;
   border-radius: 50%;
@@ -1027,8 +1008,7 @@ h1, h2, h3 {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: var(--text-muted);
-  opacity: 0.75;
+  color: var(--text);
   font-family: 'Space Mono', monospace;
   font-size: 0.82rem;
   letter-spacing: 0.05em;
@@ -1054,8 +1034,7 @@ h1, h2, h3 {
   font-family: 'Space Mono', monospace;
   font-size: 0.7rem;
   letter-spacing: 0.03em;
-  color: var(--text-muted);
-  opacity: 0.75;
+  color: var(--text);
   z-index: 5;
   text-align: right;
   line-height: 1.6;
@@ -1106,7 +1085,6 @@ h1, h2, h3 {
   right: 8px;
   height: 0;
   border-top: 2px dotted var(--gold);
-  opacity: 0.85;
 }
 
 .marquee-lights::before { top: -9px; }
@@ -1146,8 +1124,7 @@ h1, h2, h3 {
   font-size: 0.78rem;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: var(--text-muted);
-  opacity: 0.75;
+  color: var(--text);
   margin-top: 14px;
 }
 
@@ -1177,8 +1154,7 @@ h1, h2, h3 {
 }
 
 .search-box input::placeholder {
-  color: var(--text-muted);
-  opacity: 0.6;
+  color: var(--text);
 }
 
 .search-box input:focus {
@@ -1247,16 +1223,14 @@ h1, h2, h3 {
 }
 
 .d-year {
-  color: var(--text-muted);
-  opacity: 0.7;
+  color: var(--text);
   font-size: 0.85rem;
   font-family: 'Space Mono', monospace;
 }
 
 .dropdown-empty {
   padding: 16px 18px;
-  color: var(--text-muted);
-  opacity: 0.7;
+  color: var(--text);
   font-size: 0.9rem;
 }
 
@@ -1300,5 +1274,4 @@ h1, h2, h3 {
 
 .login-box button:hover {
   border-color: var(--gold);
-  opacity: 0.85;
 }
