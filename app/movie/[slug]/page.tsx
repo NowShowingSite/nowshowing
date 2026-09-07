@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabaseClient";
+import Link from "next/link";
 import RatingForm from "@/components/RatingForm";
 
 // Same fix as the home page -- always check the database fresh,
@@ -10,7 +11,7 @@ async function getMovie(slug: string) {
 
   const { data: movie, error } = await supabase
     .from("movies")
-    .select("id, title, year, genre, director, runtime, poster_url, tmdb_id")
+    .select("id, title, year, genre, director, runtime, poster_url, tmdb_id, collections")
     .eq("slug", slug)
     .single();
 
@@ -65,6 +66,15 @@ export default async function MovieDetailPage({
   return (
     <div className="movie-list">
       <div className="ticket">
+        {movie.collections && movie.collections.length > 0 && (
+          <div className="collection-badge-stack">
+            {movie.collections.map((c: string) => (
+              <Link key={c} href={`/collection/${encodeURIComponent(c)}`} className="collection-badge">
+                {c}
+              </Link>
+            ))}
+          </div>
+        )}
         {movie.poster_url ? (
           <img src={movie.poster_url} alt="" className="ticket-poster" />
         ) : (

@@ -22,6 +22,7 @@ export default function AddMoviePage() {
 
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<any[]>([]);
+  const [collectionsInput, setCollectionsInput] = useState("");
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState("");
 
@@ -59,6 +60,13 @@ export default function AddMoviePage() {
 
     const slug = slugify(details.title, details.year);
 
+    // Turn "Dark Knight Trilogy, DC" into ["Dark Knight Trilogy", "DC"],
+    // preserving the specific-to-broad order you typed them in.
+    const collections = collectionsInput
+      .split(",")
+      .map((c) => c.trim())
+      .filter(Boolean);
+
     const { error } = await supabase.from("movies").insert({
       slug,
       title: details.title,
@@ -68,6 +76,7 @@ export default function AddMoviePage() {
       runtime: details.runtime,
       poster_url: details.posterUrl,
       tmdb_id: tmdbId,
+      collections: collections.length > 0 ? collections : null,
     });
 
     if (error) {
@@ -102,6 +111,27 @@ export default function AddMoviePage() {
           style={{ flex: 1, width: "auto" }}
         />
         <button onClick={handleSearch}>Search</button>
+      </div>
+
+      <div style={{ marginTop: "12px" }}>
+        <label style={{ fontSize: "0.8rem", color: "var(--text-muted)", opacity: 0.75, display: "block", marginBottom: "6px" }}>
+          Collections (optional, comma-separated, specific to broad — e.g. "Dark Knight Trilogy, DC")
+        </label>
+        <input
+          type="text"
+          placeholder="e.g. MCU"
+          value={collectionsInput}
+          onChange={(e) => setCollectionsInput(e.target.value)}
+          style={{
+            width: "100%",
+            padding: "10px 12px",
+            borderRadius: "6px",
+            border: "1px solid var(--divider)",
+            background: "var(--bg)",
+            color: "var(--text)",
+            fontFamily: "'Inter', sans-serif",
+          }}
+        />
       </div>
 
       {status && <p>{status}</p>}

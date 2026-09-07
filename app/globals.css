@@ -366,6 +366,42 @@ h1, h2, h3 {
   color: var(--gold);
 }
 
+/* ---------- Collection badges ---------- */
+.collection-badge-stack {
+  position: absolute;
+  top: 18px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  z-index: 2;
+  max-width: calc(100% - 48px);
+}
+
+.collection-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  opacity: 0.85;
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  border-radius: 20px;
+  padding: 5px 12px;
+  transition: border-color 0.15s ease, color 0.15s ease;
+  text-align: right;
+}
+
+.collection-badge:hover {
+  color: var(--gold);
+  border-color: var(--gold-dim);
+  opacity: 1;
+}
+
 /* ---------- Movie of the Day ---------- */
 .motd-wrap {
   max-width: 720px;
