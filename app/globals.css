@@ -725,6 +725,33 @@ h1, h2, h3 {
   opacity: 0.85;
 }
 
+.watchlist-toggle-btn {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--gold-dim);
+  background: var(--surface);
+  color: var(--text-muted);
+  opacity: 0.7;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.95rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+
+.watchlist-toggle-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  opacity: 1;
+}
+
 .director-link {
   cursor: pointer;
   text-decoration: underline;

@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabaseClient";
 import Link from "next/link";
 import RatingForm from "@/components/RatingForm";
 import DirectorLink from "@/components/DirectorLink";
+import WatchlistToggle from "@/components/WatchlistToggle";
 
 // Same fix as the home page -- always check the database fresh,
 // never serve a stale snapshot from build time.
@@ -94,6 +95,14 @@ export default async function MovieDetailPage({
         ← Back to search
       </Link>
       <div className="ticket">
+        <WatchlistToggle
+          tmdbId={movie.tmdb_id}
+          title={movie.title}
+          year={movie.year}
+          genre={movie.genre}
+          director={movie.director}
+          posterUrl={movie.poster_url}
+        />
         {movie.collections && movie.collections.length > 0 && (
           <div className="collection-badge-stack">
             {movie.collections.map((c: string) => (
