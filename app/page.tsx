@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabaseClient";
 import Link from "next/link";
+import SearchBar from "@/components/SearchBar";
 
 // Without this, Next.js would "bake in" whatever the database looked
 // like at build time and serve that same snapshot to everyone until
@@ -49,29 +50,32 @@ export default async function HomePage() {
   const { movies, error } = await getMovies();
 
   return (
-    <div className="movie-list">
-      <h1>All Movies</h1>
-      {error && (
-        <p style={{ color: "salmon" }}>Error loading movies: {error}</p>
-      )}
-      {!error && movies.length === 0 && (
-        <p>No movies yet — add some in Supabase's Table Editor to get started.</p>
-      )}
-      {movies.map((movie: any) => (
-        <Link key={movie.id} href={`/movie/${movie.slug}`} className="movie-row">
-          {movie.poster_url ? (
-            <img src={movie.poster_url} alt="" className="movie-row-poster" />
-          ) : (
-            <div className="movie-row-poster" />
-          )}
-          <div className="movie-row-info">
-            {movie.title} {movie.year ? `(${movie.year})` : ""}
-          </div>
-          <span className="avg-score">
-            {movie.avg} {movie.count > 0 && `(${movie.count})`}
-          </span>
-        </Link>
-      ))}
-    </div>
+    <>
+      <SearchBar />
+      <div className="movie-list">
+        <h1>All Movies</h1>
+        {error && (
+          <p style={{ color: "salmon" }}>Error loading movies: {error}</p>
+        )}
+        {!error && movies.length === 0 && (
+          <p>No movies yet — add some in Supabase's Table Editor to get started.</p>
+        )}
+        {movies.map((movie: any) => (
+          <Link key={movie.id} href={`/movie/${movie.slug}`} className="movie-row">
+            {movie.poster_url ? (
+              <img src={movie.poster_url} alt="" className="movie-row-poster" />
+            ) : (
+              <div className="movie-row-poster" />
+            )}
+            <div className="movie-row-info">
+              {movie.title} {movie.year ? `(${movie.year})` : ""}
+            </div>
+            <span className="avg-score">
+              {movie.avg} {movie.count > 0 && `(${movie.count})`}
+            </span>
+          </Link>
+        ))}
+      </div>
+    </>
   );
 }
