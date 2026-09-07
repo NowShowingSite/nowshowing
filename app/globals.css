@@ -1007,6 +1007,9 @@ h1, h2, h3 {
   color: var(--gold);
   letter-spacing: 0.03em;
   display: block;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.87rem;
+  margin-bottom: 6px;
 }
 
 .motd-title {
