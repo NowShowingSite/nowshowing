@@ -11,6 +11,12 @@ function ratingColor(score: number | null) {
   return `hsl(${(clamped / 10) * 120}, 70%, 50%)`;
 }
 
+// Keeps up to 2 decimal places, but trims trailing zeros -- 9.50
+// shows as "9.5", 10.00 shows as "10", but 9.25 stays exactly 9.25.
+function formatRating(n: number) {
+  return parseFloat(n.toFixed(2)).toString();
+}
+
 type AdminScore = { username: string; score: number | null };
 
 export default function RatingForm({
@@ -36,7 +42,7 @@ export default function RatingForm({
   const [submitting, setSubmitting] = useState(false);
 
   const hasRating = avg !== null;
-  const avgText = hasRating ? avg!.toFixed(2) : "N/A";
+  const avgText = hasRating ? formatRating(avg!) : "N/A";
   const badgeColor = hasRating ? ratingColor(avg) : "var(--text-muted)";
 
   async function handleOpenRate() {
@@ -112,7 +118,7 @@ export default function RatingForm({
             return (
               <div key={a.username} className="inline-score-item">
                 <div className="inline-score-badge" style={{ borderColor: color, color }}>
-                  {a.score !== null ? a.score.toFixed(2) : "N/A"}
+                  {a.score !== null ? formatRating(a.score) : "N/A"}
                 </div>
                 <span className="inline-score-name">{a.username}</span>
               </div>

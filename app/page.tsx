@@ -10,6 +10,12 @@ import MovieBrowser from "@/components/MovieBrowser";
 // time someone visits the page.
 export const dynamic = "force-dynamic";
 
+// Keeps up to 2 decimal places, but trims trailing zeros -- 9.50
+// shows as "9.5", 10.00 shows as "10", but 9.25 stays exactly 9.25.
+function formatRating(n: number) {
+  return parseFloat(n.toFixed(2)).toString();
+}
+
 // This runs on the server each time the page loads, fetching the
 // current list of movies and their ratings straight from Supabase.
 async function getMovies() {
@@ -40,7 +46,7 @@ async function getMovies() {
     const scores = scoresByMovie[movie.id] ?? [];
     const avg =
       scores.length > 0
-        ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2)
+        ? formatRating(scores.reduce((a, b) => a + b, 0) / scores.length)
         : "—";
     return { ...movie, avg, count: scores.length };
   });

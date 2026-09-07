@@ -13,6 +13,12 @@ function ratingColor(avg: number | null) {
   return `hsl(${(clamped / 10) * 120}, 70%, 50%)`;
 }
 
+// Keeps up to 2 decimal places, but trims trailing zeros -- 9.50
+// shows as "9.5", 10.00 shows as "10", but 9.25 stays exactly 9.25.
+function formatRating(n: number) {
+  return parseFloat(n.toFixed(2)).toString();
+}
+
 export default function DirectorLink({
   name,
   currentSlug,
@@ -99,7 +105,7 @@ export default function DirectorLink({
                       <span className="modal-movie-meta">
                         <span>{m.year ?? ""}</span>
                         <span style={{ color: ratingColor(m.avg) }}>
-                          {m.avg !== null ? m.avg.toFixed(2) : "—"}
+                          {m.avg !== null ? formatRating(m.avg) : "—"}
                         </span>
                       </span>
                     </div>
