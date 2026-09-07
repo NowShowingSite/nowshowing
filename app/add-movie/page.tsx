@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
 
 // Turns a title into a URL-friendly slug, e.g. "The Batman" -> "the-batman".
@@ -16,7 +15,6 @@ function slugify(title: string, year: number | null) {
 
 export default function AddMoviePage() {
   const supabase = createClient();
-  const router = useRouter();
 
   const [checkingAccess, setCheckingAccess] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -27,6 +25,7 @@ export default function AddMoviePage() {
   const [collectionsInput, setCollectionsInput] = useState("");
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState("");
+  const [lastAddedSlug, setLastAddedSlug] = useState<string | null>(null);
 
   // Only admins should be able to use this page at all.
   useEffect(() => {
@@ -89,7 +88,12 @@ export default function AddMoviePage() {
       setStatus(`Error: ${error.message}`);
     } else {
       setStatus(`Added "${details.title}"!`);
-      router.push(`/movie/${slug}`);
+      setLastAddedSlug(slug);
+      // Reset so you can immediately search for the next one, instead
+      // of getting navigated away after every single add.
+      setQuery("");
+      setResults([]);
+      setCollectionsInput("");
     }
     setSaving(false);
   }
@@ -162,7 +166,19 @@ export default function AddMoviePage() {
         />
       </div>
 
-      {status && <p>{status}</p>}
+      {status && (
+        <p>
+          {status}
+          {lastAddedSlug && (
+            <>
+              {" "}
+              <Link href={`/movie/${lastAddedSlug}`} className="director-link">
+                View it →
+              </Link>
+            </>
+          )}
+        </p>
+      )}
 
       <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "16px" }}>
         {results.map((r) => (
