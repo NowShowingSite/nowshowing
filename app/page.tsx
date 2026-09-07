@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabaseClient";
 import Link from "next/link";
 import SearchBar from "@/components/SearchBar";
+import UpcomingReleases from "@/components/UpcomingReleases";
 
 // Without this, Next.js would "bake in" whatever the database looked
 // like at build time and serve that same snapshot to everyone until
@@ -51,6 +52,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <UpcomingReleases />
       <SearchBar />
       <div className="movie-list">
         <h1>All Movies</h1>
