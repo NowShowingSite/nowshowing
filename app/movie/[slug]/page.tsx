@@ -76,8 +76,15 @@ export default async function MovieDetailPage({
 
   const avg =
     ratings.length > 0
-      ? (ratings.reduce((sum, r) => sum + r.score, 0) / ratings.length).toFixed(1)
+      ? ratings.reduce((sum, r) => sum + r.score, 0) / ratings.length
       : null;
+  const hasRating = avg !== null;
+  const avgText = hasRating ? avg!.toFixed(1) : "N/A";
+
+  // Red at 0, green at 10 -- same scale used for individual scores.
+  const badgeColor = hasRating
+    ? `hsl(${(Math.max(0, Math.min(10, avg!)) / 10) * 120}, 70%, 50%)`
+    : "var(--text-muted)";
 
   return (
     <div className="detail-wrap">
@@ -94,64 +101,69 @@ export default async function MovieDetailPage({
             ))}
           </div>
         )}
-        {movie.poster_url ? (
+        <div className="ticket-layout">
           <div className="poster-col">
-            <img src={movie.poster_url} alt="" className="ticket-poster" />
-            {movie.trailer_url && (
-              <a href={movie.trailer_url} target="_blank" rel="noopener noreferrer" className="trailer-btn">
-                ▶ Trailer
-              </a>
-            )}
-          </div>
-        ) : (
-          <div className="poster-col">
-            <div className="ticket-poster" />
-            {movie.trailer_url && (
-              <a href={movie.trailer_url} target="_blank" rel="noopener noreferrer" className="trailer-btn">
-                ▶ Trailer
-              </a>
-            )}
-          </div>
-        )}
-        <div className="ticket-info">
-          {avg && (
-            <div className="rating-badge">
-              <span className="num">{avg}</span>
-              <span className="out">OUT OF 10</span>
+            <div className="ticket-poster">
+              {movie.poster_url ? (
+                <img src={movie.poster_url} alt="" />
+              ) : (
+                "No poster yet"
+              )}
             </div>
-          )}
-          <h1 className="detail-title">
-            {movie.title} {movie.year ? `(${movie.year})` : ""}
-          </h1>
-          <div className="meta-line">
-            <span>{movie.genre}</span>
-            {movie.runtime && <span className="meta-runtime">{movie.runtime}m</span>}
-          </div>
-          <p className="meta-director">
-            Director:{" "}
-            {movie.director ? (
-              <Link href={`/director/${encodeURIComponent(movie.director)}`} className="director-link">
-                {movie.director}
-              </Link>
-            ) : (
-              "Unknown"
+            {movie.trailer_url && (
+              <a href={movie.trailer_url} target="_blank" rel="noopener noreferrer" className="trailer-btn">
+                ▶ Trailer
+              </a>
             )}
-          </p>
+          </div>
+          <div className="ticket-info">
+            <div className="rating-row">
+              <div className="rating-badge" style={{ borderColor: badgeColor }}>
+                <span className="num" style={{ color: badgeColor }}>{avgText}</span>
+                <span className={`out${hasRating ? "" : " out-small"}`}>
+                  {hasRating ? "OUT OF 10" : (
+                    <>NOT YET<br />RATED</>
+                  )}
+                </span>
+              </div>
+              {hasRating && avg === 10 && (
+                <div className="perfect-score">Perfect<br />Score</div>
+              )}
+            </div>
 
-          <h3>Ratings</h3>
-          {ratings.length === 0 && <p>No ratings yet — be the first.</p>}
-          <ul className="ratings-list">
-            {ratings.map((r, i) => (
-              <li key={i}>
-                <span>{r.username}</span>
-                <span style={{ color: "var(--gold)" }}>{r.score}</span>
-              </li>
-            ))}
-          </ul>
+            <h1 className="detail-title">
+              {movie.title} {movie.year ? `(${movie.year})` : ""}
+            </h1>
+            <div className="meta-line">
+              <span>{movie.genre}</span>
+              {movie.runtime && <span className="meta-runtime">{movie.runtime}m</span>}
+            </div>
+            <p className="meta-director">
+              Director:{" "}
+              {movie.director ? (
+                <Link href={`/director/${encodeURIComponent(movie.director)}`} className="director-link">
+                  {movie.director}
+                </Link>
+              ) : (
+                "Unknown"
+              )}
+            </p>
 
-          {/* This is a client component -- it needs to know who's
-              logged in and handle the form submission interactively. */}
-          <RatingForm movieId={movie.id} tmdbId={movie.tmdb_id} />
+            <h3>Ratings</h3>
+            {ratings.length === 0 && <p>No ratings yet — be the first.</p>}
+            <ul className="ratings-list">
+              {ratings.map((r, i) => (
+                <li key={i}>
+                  <span>{r.username}</span>
+                  <span style={{ color: "var(--gold)" }}>{r.score}</span>
+                </li>
+              ))}
+            </ul>
+
+            {/* This is a client component -- it needs to know who's
+                logged in and handle the form submission interactively. */}
+            <RatingForm movieId={movie.id} tmdbId={movie.tmdb_id} />
+          </div>
         </div>
       </div>
     </div>
