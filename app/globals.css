@@ -218,8 +218,20 @@ h1, h2, h3 {
 }
 
 .meta-director {
-  font-family: 'Inter', sans-serif;
-  margin-top: 6px;
+  color: var(--text-muted);
+  opacity: 0.75;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+.rating-badge-clickable {
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.rating-badge-clickable:hover {
+  transform: rotate(-6deg) scale(1.05);
 }
 
 @media (max-width: 560px) {

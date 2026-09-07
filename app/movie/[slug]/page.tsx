@@ -14,14 +14,6 @@ function formatRuntime(minutes: number | null) {
   return h > 0 ? `${h}h ${m}m` : `${m}m`;
 }
 
-// Red at 0, green at 10, yellow in between -- used for every score
-// shown on this page (the average badge and each individual rating).
-function ratingColor(score: number | null) {
-  if (score === null || isNaN(score)) return "var(--text-muted)";
-  const clamped = Math.max(0, Math.min(10, score));
-  return `hsl(${(clamped / 10) * 120}, 70%, 50%)`;
-}
-
 async function getMovie(slug: string) {
   const supabase = createClient();
 
@@ -32,34 +24,22 @@ async function getMovie(slug: string) {
     .single();
 
   if (error || !movie) {
-    return { movie: null, error: error?.message ?? null, ratings: [] };
+    return { movie: null, error: error?.message ?? null, avg: null };
   }
 
-  // Fetch ratings for this movie on their own (no nested join --
-  // that was silently dropping rows).
+  // Just need the scores to compute an average -- no need for
+  // usernames anymore since the per-person breakdown isn't shown.
   const { data: ratings } = await supabase
     .from("ratings")
-    .select("score, user_id")
+    .select("score")
     .eq("movie_id", movie.id);
 
-  // Fetch the usernames for whoever left those ratings, then match
-  // them up in plain JavaScript.
-  const userIds = (ratings ?? []).map((r) => r.user_id);
-  let profileMap: Record<string, string> = {};
-  if (userIds.length > 0) {
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("id, username")
-      .in("id", userIds);
-    profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.id, p.username]));
-  }
+  const avg =
+    ratings && ratings.length > 0
+      ? ratings.reduce((sum, r) => sum + r.score, 0) / ratings.length
+      : null;
 
-  const mergedRatings = (ratings ?? []).map((r) => ({
-    score: r.score,
-    username: profileMap[r.user_id] ?? "someone",
-  }));
-
-  return { movie, error: null, ratings: mergedRatings };
+  return { movie, error: null, avg };
 }
 
 export default async function MovieDetailPage({
@@ -67,7 +47,7 @@ export default async function MovieDetailPage({
 }: {
   params: { slug: string };
 }) {
-  const { movie, error, ratings } = await getMovie(params.slug);
+  const { movie, error, avg } = await getMovie(params.slug);
 
   if (error) {
     return (
@@ -89,16 +69,6 @@ export default async function MovieDetailPage({
       </div>
     );
   }
-
-  const avg =
-    ratings.length > 0
-      ? ratings.reduce((sum, r) => sum + r.score, 0) / ratings.length
-      : null;
-  const hasRating = avg !== null;
-  const avgText = hasRating ? avg!.toFixed(1) : "N/A";
-
-  // Red at 0, green at 10 -- same scale used for individual scores.
-  const badgeColor = hasRating ? ratingColor(avg) : "var(--text-muted)";
 
   return (
     <div className="detail-wrap">
@@ -131,19 +101,10 @@ export default async function MovieDetailPage({
             )}
           </div>
           <div className="ticket-info">
-            <div className="rating-row">
-              <div className="rating-badge" style={{ borderColor: badgeColor }}>
-                <span className="num" style={{ color: badgeColor }}>{avgText}</span>
-                <span className={`out${hasRating ? "" : " out-small"}`}>
-                  {hasRating ? "OUT OF 10" : (
-                    <>NOT YET<br />RATED</>
-                  )}
-                </span>
-              </div>
-              {hasRating && avg === 10 && (
-                <div className="perfect-score">Perfect<br />Score</div>
-              )}
-            </div>
+            {/* Clickable rating badge -- click it to enter your score.
+                This is a client component since it needs to know who's
+                logged in and handle the prompt/submit interactively. */}
+            <RatingForm movieId={movie.id} tmdbId={movie.tmdb_id} avg={avg} />
 
             <h1 className="detail-title">{movie.title}</h1>
             <div className="meta-line">
@@ -161,21 +122,6 @@ export default async function MovieDetailPage({
                 "Unknown"
               )}
             </p>
-
-            <h3>Ratings</h3>
-            {ratings.length === 0 && <p>No ratings yet — be the first.</p>}
-            <ul className="ratings-list">
-              {ratings.map((r, i) => (
-                <li key={i}>
-                  <span>{r.username}</span>
-                  <span style={{ color: ratingColor(r.score) }}>{r.score}</span>
-                </li>
-              ))}
-            </ul>
-
-            {/* This is a client component -- it needs to know who's
-                logged in and handle the form submission interactively. */}
-            <RatingForm movieId={movie.id} tmdbId={movie.tmdb_id} />
           </div>
         </div>
       </div>
