@@ -711,6 +711,47 @@ h1, h2, h3 {
   border-color: var(--gold);
 }
 
+.change-poster-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--divider);
+  border-radius: 20px;
+  padding: 7px 0;
+  color: var(--text);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  cursor: pointer;
+  background: none;
+  transition: border-color 0.15s ease;
+}
+
+.change-poster-btn:hover {
+  border-color: var(--gold-dim);
+}
+
+.poster-pick-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.poster-pick-thumb {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.15s ease;
+}
+
+.poster-pick-thumb:hover {
+  border-color: var(--gold);
+}
+
 .watchlist-toggle-btn {
   position: absolute;
   bottom: 16px;

@@ -3,6 +3,7 @@ import Link from "next/link";
 import RatingForm from "@/components/RatingForm";
 import DirectorLink from "@/components/DirectorLink";
 import WatchlistToggle from "@/components/WatchlistToggle";
+import ChangePosterButton from "@/components/ChangePosterButton";
 
 // Same fix as the home page -- always check the database fresh,
 // never serve a stale snapshot from build time.
@@ -126,6 +127,7 @@ export default async function MovieDetailPage({
                 ▶ Trailer
               </a>
             )}
+            <ChangePosterButton movieId={movie.id} tmdbId={movie.tmdb_id} />
           </div>
           <div className="ticket-info">
             {/* Clickable rating badge -- click it to see the Adam/Alex/Rob
