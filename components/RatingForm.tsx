@@ -36,7 +36,7 @@ export default function RatingForm({
   const [submitting, setSubmitting] = useState(false);
 
   const hasRating = avg !== null;
-  const avgText = hasRating ? avg!.toFixed(1) : "N/A";
+  const avgText = hasRating ? avg!.toFixed(2) : "N/A";
   const badgeColor = hasRating ? ratingColor(avg) : "var(--text-muted)";
 
   async function handleOpenRate() {
@@ -112,7 +112,7 @@ export default function RatingForm({
             return (
               <div key={a.username} className="inline-score-item">
                 <div className="inline-score-badge" style={{ borderColor: color, color }}>
-                  {a.score !== null ? a.score.toFixed(1) : "N/A"}
+                  {a.score !== null ? a.score.toFixed(2) : "N/A"}
                 </div>
                 <span className="inline-score-name">{a.username}</span>
               </div>
@@ -152,7 +152,7 @@ export default function RatingForm({
                     type="number"
                     min="0"
                     max="10"
-                    step="0.1"
+                    step="0.01"
                     autoFocus
                     placeholder="0-10"
                     value={scoreInput}

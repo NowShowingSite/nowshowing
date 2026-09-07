@@ -99,7 +99,7 @@ export default function DirectorLink({
                       <span className="modal-movie-meta">
                         <span>{m.year ?? ""}</span>
                         <span style={{ color: ratingColor(m.avg) }}>
-                          {m.avg !== null ? m.avg.toFixed(1) : "—"}
+                          {m.avg !== null ? m.avg.toFixed(2) : "—"}
                         </span>
                       </span>
                     </div>

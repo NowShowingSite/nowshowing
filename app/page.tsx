@@ -40,7 +40,7 @@ async function getMovies() {
     const scores = scoresByMovie[movie.id] ?? [];
     const avg =
       scores.length > 0
-        ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1)
+        ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2)
         : "—";
     return { ...movie, avg, count: scores.length };
   });
