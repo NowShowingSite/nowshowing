@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
+import WatchlistModal from "@/components/WatchlistModal";
 
 export default function AuthStatus() {
   const supabase = createClient();
@@ -48,9 +49,7 @@ export default function AuthStatus() {
   if (email) {
     return (
       <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-        <Link href="/watchlist" className="login-link">
-          Watchlist
-        </Link>
+        <WatchlistModal />
         {isAdmin && (
           <Link href="/add-movie" className="login-link">
             Add Movie/TV
@@ -58,8 +57,7 @@ export default function AuthStatus() {
         )}
         <span
           style={{
-            color: "var(--text-muted)",
-            opacity: 0.75,
+            color: "var(--text)",
             fontFamily: "'Space Mono', monospace",
             fontSize: "0.7rem",
             letterSpacing: "0.03em",

@@ -571,6 +571,73 @@ h1, h2, h3 {
   margin: 0 0 4px;
 }
 
+.modal-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-right: 26px;
+}
+
+.shuffle-btn {
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid var(--gold-dim);
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--gold);
+  font-size: 0.95rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s ease, opacity 0.15s ease;
+  margin-top: 2px;
+  text-decoration: none;
+}
+
+.shuffle-btn:hover {
+  border-color: var(--gold);
+  opacity: 0.85;
+}
+
+.modal-search-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--surface-2);
+  border: 1px solid var(--divider);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.8rem;
+  padding: 8px 12px;
+  margin: 0 0 14px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.modal-search-input:focus {
+  border-color: var(--gold-dim);
+}
+
+.modal-search-input::placeholder {
+  color: var(--text);
+}
+
+.watchlist-remove-btn {
+  cursor: pointer;
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1;
+  padding: 2px 4px;
+  transition: color 0.15s ease;
+}
+
+.watchlist-remove-btn:hover {
+  color: #e05a5a;
+}
+
 .modal-subtitle {
   font-family: 'Space Mono', monospace;
   font-size: 0.78rem;
