@@ -721,21 +721,22 @@ h1, h2, h3 {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   width: 100%;
   box-sizing: border-box;
-  border: 1px solid var(--divider);
+  border: 1px solid var(--gold-dim);
   border-radius: 20px;
   padding: 7px 0;
-  color: var(--text);
+  color: var(--gold);
   font-family: 'Space Mono', monospace;
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   cursor: pointer;
   background: none;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, opacity 0.15s ease;
 }
 
 .change-poster-btn:hover {
-  border-color: var(--gold-dim);
+  border-color: var(--gold);
 }
 
 .poster-pick-grid {
