@@ -1318,7 +1318,8 @@ h1, h2, h3 {
   border-bottom: none;
 }
 
-.dropdown-item:hover {
+.dropdown-item:hover,
+.dropdown-item.active {
   background: var(--surface-2);
 }
 
