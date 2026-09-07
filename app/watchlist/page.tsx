@@ -4,6 +4,16 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabaseClient";
 
+// TMDB gives dates like "2026-11-13" with no time attached. Parsing
+// that directly with `new Date(...)` treats it as UTC midnight, which
+// then shifts a day earlier once displayed in most US/western
+// timezones. Parsing the year/month/day as local values avoids that.
+function formatReleaseDate(dateStr: string) {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const d = new Date(year, month - 1, day);
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
 export default function WatchlistPage() {
   const supabase = createClient();
   const [checkingAuth, setCheckingAuth] = useState(true);
@@ -64,11 +74,7 @@ export default function WatchlistPage() {
             {item.title} {item.year ? `(${item.year})` : ""}
             {item.release_date && (
               <div style={{ fontSize: "0.75rem", opacity: 0.6, fontFamily: "'Space Mono', monospace" }}>
-                {new Date(item.release_date).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })}
+                {formatReleaseDate(item.release_date)}
               </div>
             )}
           </div>

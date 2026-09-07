@@ -7,13 +7,19 @@ import { createClient } from "@/lib/supabaseClient";
 type UpcomingItem = {
   id: string;
   title: string;
-  releaseDate: Date;
+  releaseDateStr: string;
   slug: string | null; // null if this movie isn't in the shared catalog yet
 };
 
 const PAGE_SIZE = 3;
 
-function formatReleaseDate(d: Date) {
+function formatReleaseDate(dateStr: string) {
+  // TMDB gives dates like "2026-11-13" with no time attached. Parsing
+  // that directly with `new Date(...)` treats it as UTC midnight,
+  // which then shifts a day earlier once displayed in most US/western
+  // timezones. Parsing the year/month/day as local values avoids that.
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const d = new Date(year, month - 1, day);
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
@@ -28,12 +34,13 @@ export default function UpcomingReleases() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      const todayStr = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
       const { data: watchlistItems } = await supabase
         .from("watchlist")
         .select("id, title, release_date, tmdb_id")
         .eq("user_id", user.id)
         .not("release_date", "is", null)
-        .gt("release_date", new Date().toISOString())
+        .gt("release_date", todayStr)
         .order("release_date", { ascending: true });
 
       if (!watchlistItems || watchlistItems.length === 0) {
@@ -54,7 +61,7 @@ export default function UpcomingReleases() {
         watchlistItems.map((w) => ({
           id: w.id,
           title: w.title,
-          releaseDate: new Date(w.release_date),
+          releaseDateStr: w.release_date,
           slug: slugByTmdbId[w.tmdb_id] ?? null,
         }))
       );
@@ -90,7 +97,7 @@ export default function UpcomingReleases() {
               <span className="up-title">{item.title}</span>
             )}
             <span className="up-sep">—</span>
-            <span className="up-date">{formatReleaseDate(item.releaseDate)}</span>
+            <span className="up-date">{formatReleaseDate(item.releaseDateStr)}</span>
           </p>
         ))}
       </div>
