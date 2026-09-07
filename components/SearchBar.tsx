@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
 
-type MovieOption = { slug: string; title: string; year: number | null; poster_url: string | null };
+type MovieOption = { id: string; slug: string; title: string; year: number | null; poster_url: string | null };
 
 export default function SearchBar() {
   const supabase = createClient();
@@ -21,7 +21,7 @@ export default function SearchBar() {
   useEffect(() => {
     supabase
       .from("movies")
-      .select("slug, title, year, poster_url")
+      .select("id, slug, title, year, poster_url")
       .then(({ data }) => setAllMovies(data ?? []));
   }, []);
 
@@ -41,10 +41,24 @@ export default function SearchBar() {
     ? allMovies.filter((m) => m.title.toLowerCase().includes(q)).slice(0, 8)
     : [];
 
-  function goToMovie(slug: string) {
+  async function goToMovie(movie: MovieOption) {
     setQuery("");
     setOpen(false);
-    router.push(`/movie/${slug}`);
+
+    // Record this as a recent search, if logged in -- "upsert" so
+    // re-searching the same movie just bumps it to the top instead of
+    // creating a duplicate entry.
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase
+        .from("recent_searches")
+        .upsert(
+          { user_id: user.id, movie_id: movie.id, searched_at: new Date().toISOString() },
+          { onConflict: "user_id,movie_id" }
+        );
+    }
+
+    router.push(`/movie/${movie.slug}`);
   }
 
   return (
@@ -64,7 +78,7 @@ export default function SearchBar() {
           <div className="dropdown">
             {results.length === 0 && <div className="dropdown-empty">No matches found.</div>}
             {results.map((m) => (
-              <div key={m.slug} className="dropdown-item" onClick={() => goToMovie(m.slug)}>
+              <div key={m.slug} className="dropdown-item" onClick={() => goToMovie(m)}>
                 <div className="d-thumb">
                   {m.poster_url && <img src={m.poster_url} alt="" />}
                 </div>

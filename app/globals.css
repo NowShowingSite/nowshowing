@@ -302,6 +302,24 @@ h1, h2, h3 {
   opacity: 0.85;
 }
 
+.clear-recents-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  opacity: 0.75;
+  padding: 2px 0;
+  transition: color 0.15s ease, opacity 0.15s ease;
+}
+
+.clear-recents-btn:hover {
+  color: var(--gold);
+  opacity: 1;
+}
+
 /* ---------- Browse grid (stub cards) ---------- */
 .browse {
   max-width: 960px;

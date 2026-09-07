@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabaseClient";
 
 type Movie = {
   id: string;
@@ -16,6 +17,7 @@ type Movie = {
 };
 
 export default function MovieBrowser({ movies }: { movies: Movie[] }) {
+  const supabase = createClient();
   const router = useRouter();
   const [mode, setMode] = useState<"none" | "genre" | "decade" | "surprise">("none");
   const [activeGenre, setActiveGenre] = useState<string | null>(null);
@@ -23,6 +25,41 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
   const [surpriseGenre, setSurpriseGenre] = useState("any");
   const [surpriseDecade, setSurpriseDecade] = useState("any");
   const [surpriseMessage, setSurpriseMessage] = useState("");
+
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [recentMovies, setRecentMovies] = useState<Movie[] | null>(null); // null = still loading
+
+  useEffect(() => {
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setLoggedIn(false);
+        setRecentMovies([]);
+        return;
+      }
+      setLoggedIn(true);
+
+      const { data } = await supabase
+        .from("recent_searches")
+        .select("movie_id")
+        .eq("user_id", user.id)
+        .order("searched_at", { ascending: false })
+        .limit(16);
+
+      const movieById = Object.fromEntries(movies.map((m) => [m.id, m]));
+      const ordered = (data ?? [])
+        .map((r) => movieById[r.movie_id])
+        .filter(Boolean) as Movie[];
+      setRecentMovies(ordered);
+    })();
+  }, []);
+
+  async function handleClearRecents() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    await supabase.from("recent_searches").delete().eq("user_id", user.id);
+    setRecentMovies([]);
+  }
 
   // Split each movie's "Action / Crime / Superhero" genre string into
   // individual genres, and collect the unique set across everything.
@@ -36,12 +73,18 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
     new Set(movies.filter((m) => m.year).map((m) => Math.floor((m.year as number) / 10) * 10))
   ).sort((a, b) => b - a);
 
+  const browsingFiltered = activeGenre !== null || activeDecade !== null;
+
   let filtered = movies;
   if (activeGenre) {
     filtered = movies.filter((m) => m.genre?.split("/").map((g) => g.trim()).includes(activeGenre));
   } else if (activeDecade !== null) {
     filtered = movies.filter((m) => m.year && Math.floor(m.year / 10) * 10 === activeDecade);
   }
+
+  // What actually shows in the grid: the genre/decade filtered set if
+  // one is active, otherwise your recently searched movies.
+  const displayList = browsingFiltered ? filtered : (recentMovies ?? []);
 
   function reset() {
     setMode("none");
@@ -145,7 +188,7 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
 
       <div className="browse">
         <div className="browse-header">
-          {(activeGenre || activeDecade !== null) ? (
+          {browsingFiltered ? (
             <h2>
               <span className="decade-back" onClick={reset} style={{ display: "block", marginBottom: 6 }}>
                 ← Back to all movies
@@ -153,14 +196,27 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
               {activeGenre ?? `${activeDecade}s`}
             </h2>
           ) : (
-            <h2>All Movies</h2>
+            <>
+              <h2>Recently Searched</h2>
+              {displayList.length > 0 && (
+                <button className="clear-recents-btn" onClick={handleClearRecents}>
+                  Clear
+                </button>
+              )}
+            </>
           )}
         </div>
 
-        {filtered.length === 0 && <p>No movies here yet.</p>}
+        {!browsingFiltered && !loggedIn && (
+          <p>Log in and search for a movie to see it show up here.</p>
+        )}
+        {!browsingFiltered && loggedIn && displayList.length === 0 && (
+          <p>Nothing searched yet — try the search bar above.</p>
+        )}
+        {browsingFiltered && displayList.length === 0 && <p>No movies here yet.</p>}
 
         <div className="stub-grid">
-          {filtered.map((movie) => (
+          {displayList.map((movie) => (
             <Link key={movie.id} href={`/movie/${movie.slug}`} className="stub">
               <div className="stub-poster">
                 {movie.poster_url && <img src={movie.poster_url} alt="" />}
