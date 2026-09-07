@@ -302,6 +302,111 @@ h1, h2, h3 {
   opacity: 0.85;
 }
 
+/* ---------- Browse grid (stub cards) ---------- */
+.browse {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 24px 90px;
+}
+
+.browse-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  max-width: 920px;
+  margin: 0 auto 22px;
+}
+
+.browse-header h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.08em;
+  font-size: 1.3rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.stub-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 11px;
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+@media (max-width: 960px) {
+  .stub-grid { grid-template-columns: repeat(5, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .stub-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 440px) {
+  .stub-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.stub {
+  display: block;
+  cursor: pointer;
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  border-radius: 9px;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.stub:hover {
+  transform: translateY(-3px);
+  border-color: var(--gold-dim);
+}
+
+.stub-poster {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background: linear-gradient(160deg, var(--surface-2), var(--surface));
+}
+
+.stub-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.stub-body {
+  padding: 8px 6px 26px;
+}
+
+.stub-title {
+  font-weight: 600;
+  font-size: 0.76rem;
+  margin: 0 0 2px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.2;
+  min-height: 2.4em;
+}
+
+.stub-meta {
+  color: var(--text-muted);
+  opacity: 0.75;
+  font-size: 0.64rem;
+  font-family: 'Space Mono', monospace;
+}
+
+.stub-rating {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+
 /* ---------- Browse by Genre / Decade ---------- */
 .decade-btn {
   background: none;

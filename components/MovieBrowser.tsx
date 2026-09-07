@@ -143,34 +143,36 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
         </div>
       )}
 
-      <div className="movie-list">
-        {(activeGenre || activeDecade !== null) && (
-          <span className="decade-back" onClick={reset}>
-            ← Back to all movies
-          </span>
-        )}
-
-        {!activeGenre && activeDecade === null && <h1>All Movies</h1>}
-        {activeGenre && <h1>{activeGenre}</h1>}
-        {activeDecade !== null && <h1>{activeDecade}s</h1>}
+      <div className="browse">
+        <div className="browse-header">
+          {(activeGenre || activeDecade !== null) ? (
+            <h2>
+              <span className="decade-back" onClick={reset} style={{ display: "block", marginBottom: 6 }}>
+                ← Back to all movies
+              </span>
+              {activeGenre ?? `${activeDecade}s`}
+            </h2>
+          ) : (
+            <h2>All Movies</h2>
+          )}
+        </div>
 
         {filtered.length === 0 && <p>No movies here yet.</p>}
 
-        {filtered.map((movie) => (
-          <Link key={movie.id} href={`/movie/${movie.slug}`} className="movie-row">
-            {movie.poster_url ? (
-              <img src={movie.poster_url} alt="" className="movie-row-poster" />
-            ) : (
-              <div className="movie-row-poster" />
-            )}
-            <div className="movie-row-info">
-              {movie.title} {movie.year ? `(${movie.year})` : ""}
-            </div>
-            <span className="avg-score">
-              {movie.avg} {movie.count > 0 && `(${movie.count})`}
-            </span>
-          </Link>
-        ))}
+        <div className="stub-grid">
+          {filtered.map((movie) => (
+            <Link key={movie.id} href={`/movie/${movie.slug}`} className="stub">
+              <div className="stub-poster">
+                {movie.poster_url && <img src={movie.poster_url} alt="" />}
+              </div>
+              <div className="stub-body">
+                <p className="stub-title">{movie.title}</p>
+                <span className="stub-meta">{movie.year ?? ""}</span>
+              </div>
+              {movie.count > 0 && <span className="stub-rating">{movie.avg}</span>}
+            </Link>
+          ))}
+        </div>
       </div>
     </>
   );
