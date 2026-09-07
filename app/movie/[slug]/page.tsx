@@ -108,7 +108,16 @@ export default async function MovieDetailPage({
             <span>{movie.genre}</span>
             {movie.runtime && <span className="meta-runtime">{movie.runtime}m</span>}
           </div>
-          <p className="meta-director">Director: {movie.director}</p>
+          <p className="meta-director">
+            Director:{" "}
+            {movie.director ? (
+              <Link href={`/director/${encodeURIComponent(movie.director)}`} className="director-link">
+                {movie.director}
+              </Link>
+            ) : (
+              "Unknown"
+            )}
+          </p>
 
           <h3>Ratings</h3>
           {ratings.length === 0 && <p>No ratings yet — be the first.</p>}

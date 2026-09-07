@@ -402,6 +402,18 @@ h1, h2, h3 {
   opacity: 0.85;
 }
 
+.director-link {
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 0.15s ease, color 0.15s ease;
+}
+
+.director-link:hover {
+  color: var(--gold);
+  text-decoration-color: var(--gold);
+}
+
 /* ---------- Collection badges ---------- */
 .collection-badge-stack {
   position: absolute;
