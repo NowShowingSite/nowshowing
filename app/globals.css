@@ -1172,6 +1172,14 @@ h1, h2, h3 {
 .movie-count .count-num {
   color: var(--gold);
   font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 0.15s ease;
+}
+
+.movie-count .count-num:hover {
+  text-decoration-color: var(--gold);
 }
 
 .filter-btn-row {

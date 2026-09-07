@@ -3,6 +3,7 @@ import Link from "next/link";
 import SearchBar from "@/components/SearchBar";
 import UpcomingReleases from "@/components/UpcomingReleases";
 import MovieBrowser from "@/components/MovieBrowser";
+import CountLink from "@/components/CountLink";
 
 // Without this, Next.js would "bake in" whatever the database looked
 // like at build time and serve that same snapshot to everyone until
@@ -110,10 +111,10 @@ export default async function HomePage() {
 
         <div className="movie-count">
           <div>
-            Total Movie Count: <span className="count-num">{movieCount}</span>
+            Total Movie Count: <CountLink movies={movies} mediaType="movie" count={movieCount} />
           </div>
           <div>
-            Total TV Count: <span className="count-num">{tvCount}</span>
+            Total TV Count: <CountLink movies={movies} mediaType="tv" count={tvCount} />
           </div>
         </div>
 
