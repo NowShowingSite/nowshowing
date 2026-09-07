@@ -22,43 +22,51 @@ export default function RatingForm({
 }) {
   const supabase = createClient();
   const router = useRouter();
+
+  const [open, setOpen] = useState(false);
+  const [needsLogin, setNeedsLogin] = useState(false);
+  const [scoreInput, setScoreInput] = useState("");
+  const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const hasRating = avg !== null;
   const avgText = hasRating ? avg!.toFixed(1) : "N/A";
   const badgeColor = hasRating ? ratingColor(avg) : "var(--text-muted)";
 
-  async function handleClick() {
-    if (submitting) return;
-
+  async function handleOpen() {
+    setError("");
+    setScoreInput("");
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      alert("You need to log in first.");
-      return;
-    }
+    setNeedsLogin(!user);
+    setOpen(true);
+  }
 
-    const input = window.prompt("Your rating (0-10):");
-    if (input === null) return; // cancelled
-
-    const score = parseFloat(input);
+  async function handleSubmit() {
+    const score = parseFloat(scoreInput);
     if (isNaN(score) || score < 0 || score > 10) {
-      alert("Enter a number between 0 and 10.");
+      setError("Enter a number between 0 and 10.");
       return;
     }
 
     setSubmitting(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setNeedsLogin(true);
+      setSubmitting(false);
+      return;
+    }
 
     // "upsert" means: insert a new rating, or update it if this user
     // already rated this movie (matches the unique constraint in the DB).
-    const { error } = await supabase
+    const { error: upsertError } = await supabase
       .from("ratings")
       .upsert(
         { user_id: user.id, movie_id: movieId, score },
         { onConflict: "user_id,movie_id" }
       );
 
-    if (error) {
-      alert(error.message);
+    if (upsertError) {
+      setError(upsertError.message);
       setSubmitting(false);
       return;
     }
@@ -70,6 +78,7 @@ export default function RatingForm({
     }
 
     setSubmitting(false);
+    setOpen(false);
     // The page's rating data is fetched server-side and won't know
     // about this new rating on its own -- this re-runs that fetch.
     router.refresh();
@@ -79,8 +88,8 @@ export default function RatingForm({
     <div className="rating-row">
       <div
         className="rating-badge rating-badge-clickable"
-        style={{ borderColor: badgeColor, opacity: submitting ? 0.5 : 1 }}
-        onClick={handleClick}
+        style={{ borderColor: badgeColor }}
+        onClick={handleOpen}
       >
         <span className="num" style={{ color: badgeColor }}>{avgText}</span>
         <span className={`out${hasRating ? "" : " out-small"}`}>
@@ -91,6 +100,63 @@ export default function RatingForm({
       </div>
       {hasRating && avg === 10 && (
         <div className="perfect-score">Perfect<br />Score</div>
+      )}
+
+      {open && (
+        <div className="modal-overlay" onClick={() => setOpen(false)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" aria-label="Close" onClick={() => setOpen(false)}>
+              &times;
+            </button>
+
+            {needsLogin ? (
+              <>
+                <h2 className="modal-title">Log in to rate</h2>
+                <p className="modal-subtitle">You need an account to submit a rating.</p>
+                <a href="/login" className="surprise-go-btn" style={{ display: "block", textAlign: "center" }}>
+                  Go to Login
+                </a>
+              </>
+            ) : (
+              <>
+                <h2 className="modal-title">Rate this movie</h2>
+                <p className="modal-subtitle">Pick a score from 0 to 10</p>
+                <div className="surprise-field">
+                  <input
+                    type="number"
+                    min="0"
+                    max="10"
+                    step="0.1"
+                    autoFocus
+                    placeholder="0-10"
+                    value={scoreInput}
+                    onChange={(e) => setScoreInput(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                    style={{
+                      width: "100%",
+                      background: "var(--surface-2)",
+                      border: "1px solid var(--divider)",
+                      borderRadius: "6px",
+                      color: "var(--text)",
+                      fontFamily: "'Space Mono', monospace",
+                      fontSize: "0.9rem",
+                      padding: "10px 12px",
+                    }}
+                  />
+                </div>
+                <button
+                  className="surprise-go-btn"
+                  style={{ marginTop: "14px" }}
+                  onClick={handleSubmit}
+                  disabled={submitting}
+                >
+                  {submitting ? "Saving..." : "Submit Rating"}
+                </button>
+                {error && <div className="modal-empty" style={{ marginTop: "10px" }}>{error}</div>}
+              </>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

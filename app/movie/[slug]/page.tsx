@@ -113,14 +113,14 @@ export default async function MovieDetailPage({
               <span>{movie.genre}</span>
               {movie.runtime && <span className="meta-runtime">{formatRuntime(movie.runtime)}</span>}
             </div>
-            <p className="meta-director">
+            <div className="meta-director">
               Director:{" "}
               {movie.director ? (
                 <DirectorLink name={movie.director} currentSlug={params.slug} />
               ) : (
                 "Unknown"
               )}
-            </p>
+            </div>
           </div>
         </div>
       </div>
