@@ -81,8 +81,9 @@ export default async function HomePage() {
               </div>
               <div className="motd-text">
                 <span className="motd-label">Movie of the Day</span>
-                <span className="motd-title">
-                  {motd.title} {motd.year ? `(${motd.year})` : ""}
+                <span className="motd-title">{motd.title}</span>
+                <span className="motd-meta">
+                  {motd.year ?? ""} - {motd.count > 0 ? motd.avg : "N/A"}
                 </span>
               </div>
             </Link>

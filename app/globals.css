@@ -936,7 +936,15 @@ h1, h2, h3 {
 
 .motd-title {
   color: var(--text);
+  display: block;
   transition: color 0.15s ease;
+}
+
+.motd-meta {
+  display: block;
+  color: var(--text);
+  opacity: 0.75;
+  font-size: 0.8rem;
 }
 
 .motd-box:hover .motd-title {
