@@ -53,9 +53,12 @@ async function getMovies() {
 // avoids repeating the same movie two days running (as long as there's
 // more than one movie) without needing any cooldown/history tracking,
 // which is what caused a repeat bug on the old static version.
+// TV shows are excluded -- this is "Movie of the Day," not "Title of
+// the Day."
 function pickMovieOfTheDay(movies: any[]) {
-  if (movies.length === 0) return null;
-  const sorted = [...movies].sort((a, b) => a.id.localeCompare(b.id));
+  const eligible = movies.filter((m) => m.media_type !== "tv");
+  if (eligible.length === 0) return null;
+  const sorted = [...eligible].sort((a, b) => a.id.localeCompare(b.id));
   const daysSinceEpoch = Math.floor(Date.now() / 86400000);
   const index = daysSinceEpoch % sorted.length;
   return sorted[index];
