@@ -72,7 +72,7 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
 
   return (
     <>
-      <div className="browse-buttons">
+      <div className="filter-btn-row">
         <button
           className={`decade-btn ${mode === "genre" ? "active" : ""}`}
           onClick={() => setMode(mode === "genre" ? "none" : "genre")}

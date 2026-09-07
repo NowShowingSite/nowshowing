@@ -67,22 +67,39 @@ export default async function HomePage() {
 
   return (
     <>
-      {motd && (
-        <div className="motd-wrap">
-          <Link href={`/movie/${motd.slug}`} className="motd-box">
-            <div className="motd-poster">
-              {motd.poster_url && <img src={motd.poster_url} alt="" />}
-            </div>
-            <div className="motd-text">
-              <span className="motd-label">Movie of the Day</span>
-              <span className="motd-title">
-                {motd.title} {motd.year ? `(${motd.year})` : ""}
-              </span>
-            </div>
-          </Link>
+      <div className="hero-wrap">
+        {motd && (
+          <div className="motd-wrap">
+            <Link href={`/movie/${motd.slug}`} className="motd-box">
+              <div className="motd-poster">
+                {motd.poster_url && <img src={motd.poster_url} alt="" />}
+              </div>
+              <div className="motd-text">
+                <span className="motd-label">Movie of the Day</span>
+                <span className="motd-title">
+                  {motd.title} {motd.year ? `(${motd.year})` : ""}
+                </span>
+              </div>
+            </Link>
+          </div>
+        )}
+
+        <div className="movie-count">
+          <div>
+            Total Movie Count: <span className="count-num">{movies.length}</span>
+          </div>
         </div>
-      )}
-      <UpcomingReleases />
+
+        <div className="marquee-wrap">
+          <div className="marquee-lights">
+            <span className="marquee-glow"></span>
+            <h1 className="site-title">Now Showing</h1>
+          </div>
+          <p className="site-tagline">Ratings from people whose opinions actually matter</p>
+          <UpcomingReleases />
+        </div>
+      </div>
+
       <SearchBar />
       {error && (
         <p style={{ color: "salmon", padding: "0 24px", maxWidth: 720, margin: "0 auto" }}>

@@ -303,14 +303,6 @@ h1, h2, h3 {
 }
 
 /* ---------- Browse by Genre / Decade ---------- */
-.browse-buttons {
-  max-width: 720px;
-  margin: 16px auto 0;
-  padding: 0 24px;
-  display: flex;
-  gap: 8px;
-}
-
 .decade-btn {
   background: none;
   border: 1px solid var(--divider);
@@ -509,9 +501,11 @@ h1, h2, h3 {
 
 /* ---------- Movie of the Day ---------- */
 .motd-wrap {
-  max-width: 720px;
-  margin: 24px auto 0;
-  padding: 0 24px;
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  z-index: 5;
+  max-width: 295px;
 }
 
 .motd-box {
@@ -663,6 +657,111 @@ h1, h2, h3 {
 .upcoming-arrow:disabled {
   opacity: 0.25;
   cursor: default;
+}
+
+/* ---------- Hero / marquee ---------- */
+.hero-wrap {
+  position: relative;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.movie-count {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  opacity: 0.75;
+  z-index: 5;
+  text-align: right;
+  line-height: 1.6;
+}
+
+.movie-count .count-num {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.filter-btn-row {
+  max-width: 720px;
+  margin: 16px auto 0;
+  padding: 0 24px;
+  display: flex;
+  gap: 8px;
+  z-index: 5;
+}
+
+.marquee-wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 56px 24px 10px;
+  text-align: center;
+}
+
+.marquee-lights {
+  display: inline-flex;
+  gap: 10px;
+  padding: 14px 34px;
+  border: 2px solid var(--gold-dim);
+  border-radius: 6px;
+  position: relative;
+  background: linear-gradient(180deg, #1a1621, #120f16);
+}
+
+.marquee-lights::before,
+.marquee-lights::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  height: 0;
+  border-top: 2px dotted var(--gold);
+  opacity: 0.85;
+}
+
+.marquee-lights::before { top: -9px; }
+.marquee-lights::after { bottom: -9px; }
+
+.marquee-glow {
+  position: absolute;
+  inset: -4px;
+  border-radius: 8px;
+  background: radial-gradient(ellipse at center, rgba(232, 185, 74, 0.45) 0%, rgba(232, 185, 74, 0) 70%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .marquee-glow {
+    animation: glowPulse 3.2s ease-in-out infinite;
+  }
+  @keyframes glowPulse {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+  }
+}
+
+.site-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.6rem, 7vw, 5rem);
+  letter-spacing: 0.06em;
+  color: var(--gold);
+  text-shadow: 0 0 18px rgba(232, 185, 74, 0.35);
+  margin: 0;
+  line-height: 1;
+}
+
+.site-tagline {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  opacity: 0.75;
+  margin-top: 14px;
 }
 
 /* ---------- Search ---------- */
