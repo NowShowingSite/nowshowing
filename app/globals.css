@@ -402,6 +402,63 @@ h1, h2, h3 {
   opacity: 1;
 }
 
+.surprise-btn {
+  color: var(--gold);
+  border-color: var(--gold-dim);
+}
+
+.surprise-btn:hover {
+  border-color: var(--gold);
+}
+
+.surprise-filters {
+  max-width: 720px;
+  margin: 12px auto 0;
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.surprise-field label {
+  display: block;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  opacity: 0.75;
+  margin-bottom: 6px;
+}
+
+.surprise-field select {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--divider);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.82rem;
+  padding: 8px 10px;
+}
+
+.surprise-go-btn {
+  margin-top: 6px;
+  width: 100%;
+  background: var(--gold);
+  color: #1a1408;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.surprise-go-btn:hover {
+  opacity: 0.88;
+}
+
 /* ---------- Movie of the Day ---------- */
 .motd-wrap {
   max-width: 720px;
