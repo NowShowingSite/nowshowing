@@ -4,43 +4,23 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
 
-// Turns a title into a URL-friendly slug, e.g. "The Batman" -> "the-batman".
-function slugify(title: string, year: number | null) {
-  const base = title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-  return year ? `${base}-${year}` : base;
-}
-
-export default function AddMoviePage() {
+export default function AddToWatchlistPage() {
   const supabase = createClient();
   const router = useRouter();
 
-  const [checkingAccess, setCheckingAccess] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [loggedIn, setLoggedIn] = useState(false);
 
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<any[]>([]);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState("");
 
-  // Only admins should be able to use this page at all.
   useEffect(() => {
-    (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setCheckingAccess(false);
-        return;
-      }
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("is_admin")
-        .eq("id", user.id)
-        .single();
-      setIsAdmin(profile?.is_admin ?? false);
-      setCheckingAccess(false);
-    })();
+    supabase.auth.getUser().then(({ data }) => {
+      setLoggedIn(!!data.user);
+      setCheckingAuth(false);
+    });
   }, []);
 
   async function handleSearch() {
@@ -54,44 +34,49 @@ export default function AddMoviePage() {
     setSaving(true);
     setStatus("Fetching details...");
 
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setStatus("You need to log in first.");
+      setSaving(false);
+      return;
+    }
+
     const detailsRes = await fetch(`/api/tmdb-details?id=${tmdbId}`);
     const details = await detailsRes.json();
 
-    const slug = slugify(details.title, details.year);
-
-    const { error } = await supabase.from("movies").insert({
-      slug,
+    const { error } = await supabase.from("watchlist").insert({
+      user_id: user.id,
+      tmdb_id: tmdbId,
       title: details.title,
       year: details.year,
       genre: details.genre,
       director: details.director,
-      runtime: details.runtime,
       poster_url: details.posterUrl,
-      tmdb_id: tmdbId,
+      release_date: details.releaseDate,
     });
 
     if (error) {
       setStatus(`Error: ${error.message}`);
     } else {
-      setStatus(`Added "${details.title}"!`);
-      router.push(`/movie/${slug}`);
+      setStatus(`Added "${details.title}" to your watchlist!`);
+      router.push("/watchlist");
     }
     setSaving(false);
   }
 
-  if (checkingAccess) return null;
+  if (checkingAuth) return null;
 
-  if (!isAdmin) {
+  if (!loggedIn) {
     return (
       <div className="movie-list">
-        <p>You don't have access to this page.</p>
+        <p>You need to log in to add movies to your watchlist.</p>
       </div>
     );
   }
 
   return (
     <div className="movie-list">
-      <h1>Add a Movie</h1>
+      <h1>Add to Watchlist</h1>
       <div className="rating-form">
         <input
           type="text"

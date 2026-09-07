@@ -48,6 +48,9 @@ export default function AuthStatus() {
   if (email) {
     return (
       <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+        <Link href="/watchlist" className="login-link">
+          Watchlist
+        </Link>
         {isAdmin && (
           <Link href="/add-movie" className="login-link">
             Add Movie

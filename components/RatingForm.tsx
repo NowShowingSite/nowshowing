@@ -4,7 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
 
-export default function RatingForm({ movieId }: { movieId: string }) {
+export default function RatingForm({
+  movieId,
+  tmdbId,
+}: {
+  movieId: string;
+  tmdbId?: number | null;
+}) {
   const supabase = createClient();
   const router = useRouter();
   const [score, setScore] = useState("");
@@ -30,6 +36,16 @@ export default function RatingForm({ movieId }: { movieId: string }) {
     if (error) {
       setStatus(error.message);
       return;
+    }
+
+    // If this movie was on your watchlist, rating it means you've now
+    // watched it -- so clear it off automatically.
+    if (tmdbId) {
+      await supabase
+        .from("watchlist")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("tmdb_id", tmdbId);
     }
 
     setStatus("Rating saved!");

@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     title: data.title,
     year: data.release_date ? parseInt(data.release_date.slice(0, 4)) : null,
+    releaseDate: data.release_date || null,
     genre,
     director: director?.name ?? "",
     runtime: data.runtime ?? null,

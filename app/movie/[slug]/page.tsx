@@ -10,7 +10,7 @@ async function getMovie(slug: string) {
 
   const { data: movie, error } = await supabase
     .from("movies")
-    .select("id, title, year, genre, director, runtime, poster_url")
+    .select("id, title, year, genre, director, runtime, poster_url, tmdb_id")
     .eq("slug", slug)
     .single();
 
@@ -99,7 +99,7 @@ export default async function MovieDetailPage({
 
           {/* This is a client component -- it needs to know who's
               logged in and handle the form submission interactively. */}
-          <RatingForm movieId={movie.id} />
+          <RatingForm movieId={movie.id} tmdbId={movie.tmdb_id} />
         </div>
       </div>
     </div>
