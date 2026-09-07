@@ -32,7 +32,7 @@ export default function DirectorLink({
     const { data: directorMovies } = await supabase
       .from("movies")
       .select("id, slug, title, year")
-      .eq("director", name)
+      .or(`director.eq.${name},creator.eq.${name}`)
       .order("year", { ascending: true });
 
     const list = directorMovies ?? [];

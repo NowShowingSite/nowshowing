@@ -2,8 +2,43 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   const tmdbId = request.nextUrl.searchParams.get("id");
+  const type = request.nextUrl.searchParams.get("type") === "tv" ? "tv" : "movie";
   if (!tmdbId) {
     return NextResponse.json({ error: "Missing id" }, { status: 400 });
+  }
+
+  if (type === "tv") {
+    const res = await fetch(
+      `https://api.themoviedb.org/3/tv/${tmdbId}?append_to_response=credits,videos&api_key=${process.env.TMDB_API_KEY}`
+    );
+    const data = await res.json();
+
+    const genre = (data.genres ?? []).map((g: any) => g.name).join(" / ");
+    const creators = (data.created_by ?? []).map((c: any) => c.name).join(" & ");
+
+    const videos = data.videos?.results ?? [];
+    const trailer =
+      videos.find((v: any) => v.site === "YouTube" && v.type === "Trailer" && v.official) ??
+      videos.find((v: any) => v.site === "YouTube" && v.type === "Trailer");
+    const trailerUrl = trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : null;
+
+    const yearStart = data.first_air_date ? parseInt(data.first_air_date.slice(0, 4)) : null;
+    // Still airing ("Returning Series") shows have no end year yet.
+    const isOngoing = data.status === "Returning Series" || data.in_production;
+    const yearEnd =
+      !isOngoing && data.last_air_date ? parseInt(data.last_air_date.slice(0, 4)) : null;
+
+    return NextResponse.json({
+      title: data.name,
+      year: yearStart,
+      yearEnd,
+      releaseDate: data.first_air_date || null,
+      genre,
+      director: creators || "Unknown",
+      runtime: null,
+      posterUrl: data.poster_path ? `https://image.tmdb.org/t/p/w500${data.poster_path}` : null,
+      trailerUrl,
+    });
   }
 
   const res = await fetch(
@@ -36,6 +71,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     title: data.title,
     year: releaseDate ? parseInt(releaseDate.slice(0, 4)) : null,
+    yearEnd: null,
     releaseDate,
     genre,
     director: director?.name ?? "",

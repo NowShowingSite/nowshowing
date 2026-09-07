@@ -17,7 +17,7 @@ async function getMovies() {
 
   const { data: movies, error } = await supabase
     .from("movies")
-    .select("id, slug, title, year, poster_url, genre")
+    .select("id, slug, title, year, poster_url, genre, media_type")
     .order("title");
 
   if (error) {
@@ -64,6 +64,8 @@ function pickMovieOfTheDay(movies: any[]) {
 export default async function HomePage() {
   const { movies, error } = await getMovies();
   const motd = pickMovieOfTheDay(movies);
+  const movieCount = movies.filter((m: any) => m.media_type !== "tv").length;
+  const tvCount = movies.filter((m: any) => m.media_type === "tv").length;
 
   return (
     <>
@@ -86,7 +88,10 @@ export default async function HomePage() {
 
         <div className="movie-count">
           <div>
-            Total Movie Count: <span className="count-num">{movies.length}</span>
+            Total Movie Count: <span className="count-num">{movieCount}</span>
+          </div>
+          <div>
+            Total TV Count: <span className="count-num">{tvCount}</span>
           </div>
         </div>
 

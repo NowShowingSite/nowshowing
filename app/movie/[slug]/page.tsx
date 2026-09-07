@@ -17,12 +17,19 @@ function formatRuntime(minutes: number | null) {
   return h > 0 ? `${h}h ${m}m` : `${m}m`;
 }
 
+// TV shows show a year range: "2016–2019", or "2016–present" if still airing.
+function formatYearDisplay(movie: { year: number | null; year_end: number | null; media_type: string }) {
+  if (movie.media_type !== "tv") return movie.year;
+  if (!movie.year) return "";
+  return `${movie.year}–${movie.year_end ?? "present"}`;
+}
+
 async function getMovie(slug: string) {
   const supabase = createClient();
 
   const { data: movie, error } = await supabase
     .from("movies")
-    .select("id, title, year, genre, director, runtime, poster_url, tmdb_id, collections, trailer_url")
+    .select("id, title, year, year_end, genre, director, creator, runtime, poster_url, tmdb_id, collections, trailer_url, media_type")
     .eq("slug", slug)
     .single();
 
@@ -127,7 +134,7 @@ export default async function MovieDetailPage({
                 ▶ Trailer
               </a>
             )}
-            <ChangePosterButton movieId={movie.id} tmdbId={movie.tmdb_id} />
+            <ChangePosterButton movieId={movie.id} tmdbId={movie.tmdb_id} mediaType={movie.media_type} />
           </div>
           <div className="ticket-info">
             {/* Clickable rating badge -- click it to see the Adam/Alex/Rob
@@ -138,14 +145,19 @@ export default async function MovieDetailPage({
 
             <h1 className="detail-title">{movie.title}</h1>
             <div className="meta-line">
-              <span className="meta-year">{movie.year}</span>
+              <span className="meta-year">{formatYearDisplay(movie)}</span>
               <span>{movie.genre}</span>
-              {movie.runtime && <span className="meta-runtime">{formatRuntime(movie.runtime)}</span>}
+              {movie.media_type === "movie" && movie.runtime && (
+                <span className="meta-runtime">{formatRuntime(movie.runtime)}</span>
+              )}
             </div>
             <div className="meta-director">
-              Director:{" "}
-              {movie.director ? (
-                <DirectorLink name={movie.director} currentSlug={params.slug} />
+              {movie.media_type === "tv" ? "Creator" : "Director"}:{" "}
+              {(movie.media_type === "tv" ? movie.creator : movie.director) ? (
+                <DirectorLink
+                  name={movie.media_type === "tv" ? movie.creator : movie.director}
+                  currentSlug={params.slug}
+                />
               ) : (
                 "Unknown"
               )}

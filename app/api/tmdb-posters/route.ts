@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   const tmdbId = request.nextUrl.searchParams.get("id");
+  const type = request.nextUrl.searchParams.get("type") === "tv" ? "tv" : "movie";
   if (!tmdbId) {
     return NextResponse.json({ error: "Missing id" }, { status: 400 });
   }
 
   const res = await fetch(
-    `https://api.themoviedb.org/3/movie/${tmdbId}/images?api_key=${process.env.TMDB_API_KEY}`
+    `https://api.themoviedb.org/3/${type}/${tmdbId}/images?api_key=${process.env.TMDB_API_KEY}`
   );
   const data = await res.json();
 

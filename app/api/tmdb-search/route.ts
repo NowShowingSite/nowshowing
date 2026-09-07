@@ -6,19 +6,20 @@ import { NextRequest, NextResponse } from "next/server";
 // directly.
 export async function GET(request: NextRequest) {
   const query = request.nextUrl.searchParams.get("q");
+  const type = request.nextUrl.searchParams.get("type") === "tv" ? "tv" : "movie";
   if (!query) {
     return NextResponse.json({ results: [] });
   }
 
   const res = await fetch(
-    `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(query)}&api_key=${process.env.TMDB_API_KEY}`
+    `https://api.themoviedb.org/3/search/${type}?query=${encodeURIComponent(query)}&api_key=${process.env.TMDB_API_KEY}`
   );
   const data = await res.json();
 
   const results = (data.results ?? []).slice(0, 8).map((m: any) => ({
     tmdbId: m.id,
-    title: m.title,
-    year: m.release_date ? m.release_date.slice(0, 4) : null,
+    title: type === "tv" ? m.name : m.title,
+    year: (type === "tv" ? m.first_air_date : m.release_date)?.slice(0, 4) || null,
     posterPath: m.poster_path,
   }));
 

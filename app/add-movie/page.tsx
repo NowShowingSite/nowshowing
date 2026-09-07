@@ -21,6 +21,7 @@ export default function AddMoviePage() {
   const [checkingAccess, setCheckingAccess] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
+  const [mediaType, setMediaType] = useState<"movie" | "tv">("movie");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<any[]>([]);
   const [collectionsInput, setCollectionsInput] = useState("");
@@ -47,7 +48,7 @@ export default function AddMoviePage() {
 
   async function handleSearch() {
     if (!query.trim()) return;
-    const res = await fetch(`/api/tmdb-search?q=${encodeURIComponent(query)}`);
+    const res = await fetch(`/api/tmdb-search?q=${encodeURIComponent(query)}&type=${mediaType}`);
     const data = await res.json();
     setResults(data.results ?? []);
   }
@@ -56,7 +57,7 @@ export default function AddMoviePage() {
     setSaving(true);
     setStatus("Fetching details...");
 
-    const detailsRes = await fetch(`/api/tmdb-details?id=${tmdbId}`);
+    const detailsRes = await fetch(`/api/tmdb-details?id=${tmdbId}&type=${mediaType}`);
     const details = await detailsRes.json();
 
     const slug = slugify(details.title, details.year);
@@ -72,12 +73,15 @@ export default function AddMoviePage() {
       slug,
       title: details.title,
       year: details.year,
+      year_end: details.yearEnd,
       genre: details.genre,
-      director: details.director,
+      director: mediaType === "movie" ? details.director : null,
+      creator: mediaType === "tv" ? details.director : null,
       runtime: details.runtime,
       poster_url: details.posterUrl,
       trailer_url: details.trailerUrl,
       tmdb_id: tmdbId,
+      media_type: mediaType,
       collections: collections.length > 0 ? collections : null,
     });
 
@@ -108,11 +112,27 @@ export default function AddMoviePage() {
       <Link href="/" className="back-link">
         ← Back to search
       </Link>
-      <h1>Add a Movie</h1>
+      <h1>Add a Title</h1>
+
+      <div className="filter-btn-row" style={{ position: "static", padding: 0, margin: "0 0 12px" }}>
+        <button
+          className={`decade-btn ${mediaType === "movie" ? "active" : ""}`}
+          onClick={() => { setMediaType("movie"); setResults([]); }}
+        >
+          Movie
+        </button>
+        <button
+          className={`decade-btn ${mediaType === "tv" ? "active" : ""}`}
+          onClick={() => { setMediaType("tv"); setResults([]); }}
+        >
+          TV Show
+        </button>
+      </div>
+
       <div className="rating-form">
         <input
           type="text"
-          placeholder="Search TMDB by title..."
+          placeholder={`Search TMDB by ${mediaType === "tv" ? "show" : "movie"} title...`}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -122,7 +142,7 @@ export default function AddMoviePage() {
       </div>
 
       <div style={{ marginTop: "12px" }}>
-        <label style={{ fontSize: "0.8rem", color: "var(--text-muted)", opacity: 0.75, display: "block", marginBottom: "6px" }}>
+        <label style={{ fontSize: "0.8rem", color: "var(--text)", display: "block", marginBottom: "6px" }}>
           Collections (optional, comma-separated, specific to broad — e.g. "Dark Knight Trilogy, DC")
         </label>
         <input

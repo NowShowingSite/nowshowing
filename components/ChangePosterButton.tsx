@@ -9,9 +9,11 @@ type Poster = { url: string; language: string | null };
 export default function ChangePosterButton({
   movieId,
   tmdbId,
+  mediaType,
 }: {
   movieId: string;
   tmdbId: number | null;
+  mediaType: string;
 }) {
   const supabase = createClient();
   const router = useRouter();
@@ -37,7 +39,7 @@ export default function ChangePosterButton({
   async function handleOpen() {
     setOpen(true);
     setPosters(null);
-    const res = await fetch(`/api/tmdb-posters?id=${tmdbId}`);
+    const res = await fetch(`/api/tmdb-posters?id=${tmdbId}&type=${mediaType}`);
     const data = await res.json();
     setPosters(data.posters ?? []);
   }
