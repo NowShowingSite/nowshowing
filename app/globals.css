@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap');
 
 :root {
   --bg: #0b0b0f;
@@ -8,7 +8,7 @@
   --gold-dim: #8a7130;
   --red: #9a1f2b;
   --text: #f2efe8;
-  --text-muted: #a9a6a0;
+  --text-muted: #f2efe8;
   --divider: #2a2733;
 }
 
@@ -16,102 +16,114 @@
   box-sizing: border-box;
 }
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Space Mono', monospace;
+html, body {
   margin: 0;
+  padding: 0;
 }
 
-h1, h2, h3 {
-  font-family: 'Bebas Neue', sans-serif;
-  letter-spacing: 0.03em;
-  color: var(--gold);
-  margin: 0 0 8px;
-}
-
-h1 {
-  font-size: clamp(2rem, 5vw, 3rem);
+body {
+  background: radial-gradient(ellipse at top, #18151f 0%, var(--bg) 55%);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
 a {
   color: inherit;
+  text-decoration: none;
 }
 
+/* ---------- Header ---------- */
 .site-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
+  padding: 24px;
   border-bottom: 1px solid var(--divider);
 }
 
 .site-logo {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 1.8rem;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   color: var(--gold);
-  text-decoration: none;
+  text-shadow: 0 0 18px rgba(232, 185, 74, 0.35);
 }
 
 .login-link {
   color: var(--text-muted);
-  text-decoration: none;
+  opacity: 0.75;
   border: 1px solid var(--gold-dim);
   padding: 6px 14px;
   border-radius: 20px;
   font-family: 'Space Mono', monospace;
-  font-size: 0.82rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
   background: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
 }
 
 .login-link:hover {
   border-color: var(--gold);
   color: var(--gold);
+  opacity: 1;
 }
 
+h1, h2, h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.03em;
+  color: var(--gold);
+  margin: 0 0 6px;
+}
+
+/* ---------- Movie list (home page) ---------- */
 .movie-list {
   max-width: 720px;
   margin: 0 auto;
-  padding: 32px 24px 80px;
+  padding: 40px 24px 100px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .movie-row {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 14px;
-  padding: 10px 16px 10px 10px;
-  background: var(--surface);
+  gap: 12px;
+  padding: 12px 18px;
   border: 1px solid var(--divider);
   border-radius: 10px;
-  text-decoration: none;
-  color: var(--text);
-  transition: border-color 0.15s ease;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .movie-row:hover {
+  background: var(--surface-2);
   border-color: var(--gold-dim);
 }
 
 .movie-row-poster {
-  width: 42px;
-  height: 63px;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 44px;
+  border-radius: 3px;
+  overflow: hidden;
   object-fit: cover;
-  border-radius: 4px;
-  background: var(--surface-2);
-  flex-shrink: 0;
+  background: linear-gradient(160deg, var(--surface-2), var(--surface));
 }
 
 .movie-row-info {
   flex: 1;
   min-width: 0;
+  font-weight: 600;
 }
 
 .movie-row .avg-score {
   color: var(--gold);
+  font-family: 'Space Mono', monospace;
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -121,18 +133,34 @@ a {
   background: linear-gradient(180deg, var(--surface), var(--surface-2));
   border: 1px solid var(--divider);
   border-radius: 14px;
-  padding: 32px;
+  padding: 44px 40px;
+  position: relative;
   display: flex;
-  gap: 28px;
+  gap: 32px;
+  align-items: flex-start;
 }
 
+.ticket::before, .ticket::after {
+  content: "";
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  background: var(--bg);
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.ticket::before { left: -13px; }
+.ticket::after { right: -13px; }
+
 .ticket-poster {
-  width: 160px;
-  height: 240px;
-  object-fit: cover;
+  flex: 0 0 180px;
+  width: 180px;
+  aspect-ratio: 2 / 3;
   border-radius: 8px;
-  background: var(--surface-2);
-  flex-shrink: 0;
+  object-fit: cover;
+  background: linear-gradient(160deg, var(--surface-2), var(--surface));
 }
 
 .ticket-info {
@@ -140,15 +168,36 @@ a {
   min-width: 0;
 }
 
+.detail-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  color: var(--gold);
+  letter-spacing: 0.03em;
+  margin: 0 0 6px;
+  line-height: 1.05;
+}
+
 .meta-line {
   color: var(--text-muted);
+  opacity: 0.75;
+  font-family: 'Space Mono', monospace;
   font-size: 0.88rem;
+  line-height: 1.6;
   margin-bottom: 16px;
 }
 
+.meta-runtime {
+  white-space: nowrap;
+}
+
 .meta-line span + span::before {
-  content: " · ";
+  content: "·";
   margin: 0 0.5em;
+}
+
+.meta-director {
+  font-family: 'Inter', sans-serif;
+  margin-top: 6px;
 }
 
 @media (max-width: 560px) {
@@ -157,11 +206,42 @@ a {
   }
   .ticket-poster {
     width: 140px;
-    height: 210px;
     margin: 0 auto;
   }
 }
 
+/* ---------- Rating badge (average score circle) ---------- */
+.rating-badge {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 96px;
+  border: 3px solid var(--gold);
+  border-radius: 50%;
+  transform: rotate(-6deg);
+  margin: 0 0 20px;
+}
+
+.rating-badge .num {
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: 1.7rem;
+  color: var(--gold);
+  line-height: 1;
+}
+
+.rating-badge .out {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  opacity: 0.7;
+  letter-spacing: 0.1em;
+  margin-top: 2px;
+  font-family: 'Space Mono', monospace;
+}
+
+/* ---------- Ratings list ---------- */
 .ratings-list {
   list-style: none;
   padding: 0;
@@ -169,6 +249,8 @@ a {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.9rem;
 }
 
 .ratings-list li {
@@ -179,6 +261,7 @@ a {
   border-radius: 6px;
 }
 
+/* ---------- Rating submission form ---------- */
 .rating-form {
   display: flex;
   gap: 10px;
@@ -197,52 +280,62 @@ a {
 }
 
 .rating-form button {
-  padding: 8px 16px;
-  border-radius: 6px;
-  border: none;
-  background: var(--gold);
-  color: #000;
+  padding: 7px 18px;
+  border-radius: 20px;
+  border: 1px solid var(--gold-dim);
+  background: none;
+  color: var(--gold);
   font-weight: 700;
   cursor: pointer;
   font-family: 'Space Mono', monospace;
+  font-size: 0.85rem;
+  transition: border-color 0.15s ease, opacity 0.15s ease;
 }
 
 .rating-form button:hover {
-  opacity: 0.9;
+  border-color: var(--gold);
+  opacity: 0.85;
 }
 
+/* ---------- Login box ---------- */
 .login-box {
   max-width: 360px;
-  margin: 60px auto;
-  padding: 28px;
-  background: var(--surface);
+  margin: 80px auto;
+  padding: 32px;
+  background: linear-gradient(180deg, var(--surface), var(--surface-2));
   border: 1px solid var(--divider);
-  border-radius: 12px;
+  border-radius: 14px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
+}
+
+.login-box h2 {
+  margin-bottom: 4px;
 }
 
 .login-box input {
-  padding: 10px;
+  padding: 10px 12px;
   border-radius: 6px;
   border: 1px solid var(--divider);
   background: var(--bg);
   color: var(--text);
-  font-family: 'Space Mono', monospace;
+  font-family: 'Inter', sans-serif;
 }
 
 .login-box button {
   padding: 10px;
-  border-radius: 6px;
-  border: none;
-  background: var(--gold);
-  color: #000;
+  border-radius: 20px;
+  border: 1px solid var(--gold-dim);
+  background: none;
+  color: var(--gold);
   font-weight: 700;
   cursor: pointer;
   font-family: 'Space Mono', monospace;
+  transition: border-color 0.15s ease, opacity 0.15s ease;
 }
 
 .login-box button:hover {
-  opacity: 0.9;
+  border-color: var(--gold);
+  opacity: 0.85;
 }

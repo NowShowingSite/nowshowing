@@ -57,6 +57,11 @@ export default async function MovieDetailPage({
   }
   if (!movie) return <p style={{ padding: 24 }}>Movie not found.</p>;
 
+  const avg =
+    ratings.length > 0
+      ? (ratings.reduce((sum, r) => sum + r.score, 0) / ratings.length).toFixed(1)
+      : null;
+
   return (
     <div className="movie-list">
       <div className="ticket">
@@ -66,14 +71,20 @@ export default async function MovieDetailPage({
           <div className="ticket-poster" />
         )}
         <div className="ticket-info">
-          <h1>
+          {avg && (
+            <div className="rating-badge">
+              <span className="num">{avg}</span>
+              <span className="out">OUT OF 10</span>
+            </div>
+          )}
+          <h1 className="detail-title">
             {movie.title} {movie.year ? `(${movie.year})` : ""}
           </h1>
           <div className="meta-line">
             <span>{movie.genre}</span>
-            {movie.runtime && <span>{movie.runtime}m</span>}
+            {movie.runtime && <span className="meta-runtime">{movie.runtime}m</span>}
           </div>
-          <p>Director: {movie.director}</p>
+          <p className="meta-director">Director: {movie.director}</p>
 
           <h3>Ratings</h3>
           {ratings.length === 0 && <p>No ratings yet — be the first.</p>}
