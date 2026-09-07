@@ -587,6 +587,7 @@ h1, h2, h3 {
   cursor: pointer;
   color: var(--gold);
   font-size: 0.95rem;
+  line-height: 1;
   width: 32px;
   height: 32px;
   display: flex;
@@ -595,6 +596,12 @@ h1, h2, h3 {
   transition: border-color 0.15s ease, opacity 0.15s ease;
   margin-top: 2px;
   text-decoration: none;
+}
+
+.shuffle-btn .plus-icon {
+  display: block;
+  font-size: 1.15rem;
+  transform: translateY(-1px);
 }
 
 .shuffle-btn:hover {
