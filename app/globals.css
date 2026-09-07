@@ -216,8 +216,7 @@ h1, h2, h3 {
 }
 
 .meta-director {
-  color: var(--text-muted);
-  opacity: 0.75;
+  color: rgba(242, 239, 232, 0.75);
   font-family: 'Space Mono', monospace;
   font-size: 0.88rem;
   margin: 0;
