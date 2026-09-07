@@ -105,14 +105,9 @@ export default function RatingForm({
             )}
           </span>
         </div>
-        {hasRating && avg === 10 && (
-          <div className="perfect-score">Perfect<br />Score</div>
-        )}
-      </div>
 
-      {expanded && (
-        <div className="inline-breakdown">
-          {adminBreakdown.map((a) => {
+        {expanded &&
+          adminBreakdown.map((a) => {
             const color = a.score !== null ? ratingColor(a.score) : "var(--text-muted)";
             return (
               <div key={a.username} className="inline-score-item">
@@ -123,8 +118,11 @@ export default function RatingForm({
               </div>
             );
           })}
-        </div>
-      )}
+
+        {hasRating && avg === 10 && (
+          <div className="perfect-score">Perfect<br />Score</div>
+        )}
+      </div>
 
       <span className="rate-your-score-link" onClick={handleOpenRate}>
         Rate this movie
