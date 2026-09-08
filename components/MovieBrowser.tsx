@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
+import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
 
 type Movie = {
   id: string;
@@ -79,6 +80,7 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
   const [recentMovies, setRecentMovies] = useState<Movie[] | null>(null); // null = still loading
 
   const [modal, setModal] = useState<ModalView | null>(null);
+  useBodyScrollLock(modal !== null);
   const [surpriseGenre, setSurpriseGenre] = useState("any");
   const [surpriseDecade, setSurpriseDecade] = useState("any");
   const [surpriseMessage, setSurpriseMessage] = useState("");

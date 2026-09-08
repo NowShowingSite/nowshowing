@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
+import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
 
 type Poster = { url: string; language: string | null };
 
@@ -20,6 +21,7 @@ export default function ChangePosterButton({
 
   const [isAdmin, setIsAdmin] = useState(false);
   const [open, setOpen] = useState(false);
+  useBodyScrollLock(open);
   const [posters, setPosters] = useState<Poster[] | null>(null); // null = loading
   const [saving, setSaving] = useState(false);
 

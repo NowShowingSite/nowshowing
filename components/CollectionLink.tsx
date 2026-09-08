@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
+import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
 
 type CollectionMovie = { id: string; slug: string; title: string; year: number | null; avg: number | null };
 
@@ -29,6 +30,7 @@ export default function CollectionLink({
   const supabase = createClient();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  useBodyScrollLock(open);
   const [movies, setMovies] = useState<CollectionMovie[] | null>(null); // null = loading
 
   async function handleOpen() {

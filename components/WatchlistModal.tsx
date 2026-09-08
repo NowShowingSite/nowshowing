@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
+import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
 
 type WatchlistItem = {
   id: string;
@@ -19,6 +20,7 @@ export default function WatchlistModal() {
   const router = useRouter();
 
   const [open, setOpen] = useState(false);
+  useBodyScrollLock(open);
   const [loggedIn, setLoggedIn] = useState(false);
   const [items, setItems] = useState<WatchlistItem[] | null>(null); // null = loading
   const [search, setSearch] = useState("");

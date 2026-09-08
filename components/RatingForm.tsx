@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
+import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
 
 // Red at 0, green at 10, yellow in between.
 function ratingColor(score: number | null) {
@@ -36,6 +37,7 @@ export default function RatingForm({
   const [expanded, setExpanded] = useState(false);
 
   const [rateOpen, setRateOpen] = useState(false);
+  useBodyScrollLock(rateOpen);
   const [needsLogin, setNeedsLogin] = useState(false);
   const [scoreInput, setScoreInput] = useState("");
   const [error, setError] = useState("");
