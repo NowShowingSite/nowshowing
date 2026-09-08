@@ -25,6 +25,18 @@ function formatYearDisplay(movie: { year: number | null; year_end: number | null
   return `${movie.year}–${movie.year_end ?? "present"}`;
 }
 
+// Long titles (like Dr. Strangelove's full subtitle) would otherwise
+// wrap across many lines at the default size, blowing out the card's
+// height. Scale the font down in tiers so anything long still fits in
+// roughly the same 2-line footprint as a normal title.
+function getTitleFontSize(title: string): string | undefined {
+  const len = title.length;
+  if (len <= 25) return undefined; // use the default clamp() from CSS
+  if (len <= 40) return "clamp(1.6rem, 4vw, 2.4rem)";
+  if (len <= 60) return "clamp(1.3rem, 3.2vw, 1.9rem)";
+  return "clamp(1.1rem, 2.6vw, 1.5rem)";
+}
+
 async function getMovie(slug: string) {
   const supabase = createClient();
 
@@ -142,7 +154,9 @@ export default async function MovieDetailPage({
                 who's logged in. */}
             <RatingForm movieId={movie.id} tmdbId={movie.tmdb_id} avg={avg} adminBreakdown={adminBreakdown} />
 
-            <h1 className="detail-title">{movie.title}</h1>
+            <h1 className="detail-title" style={{ fontSize: getTitleFontSize(movie.title) }}>
+              {movie.title}
+            </h1>
             <div className="meta-line">
               <span className="meta-year">{formatYearDisplay(movie)}</span>
               <span>{movie.genre}</span>
