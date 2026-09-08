@@ -64,20 +64,32 @@ function ratingColor(avgText: string) {
   return `hsl(${(clamped / 10) * 120}, 70%, 50%)`;
 }
 
-// Picks a movie for today deterministically -- today's date maps to a
-// fixed index in the (stably-sorted) movie list. This naturally
-// avoids repeating the same movie two days running (as long as there's
-// more than one movie) without needing any cooldown/history tracking,
-// which is what caused a repeat bug on the old static version.
-// TV shows are excluded -- this is "Movie of the Day," not "Title of
-// the Day."
+// Small deterministic string hash (djb2-style) -- same input always
+// produces the same output, with no external dependency needed.
+function hashString(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = (h * 31 + s.charCodeAt(i)) | 0;
+  }
+  return h;
+}
+
+// Picks a movie for today deterministically. Each movie gets a score
+// of hash(its id + today's date), and whichever scores highest wins.
+// This is stable as the catalog grows: adding a new movie only changes
+// today's pick if that specific new movie happens to outscore the
+// current one -- unlike a modulo-based index, which reshuffles the
+// pick for EVERY movie whenever the total count changes (that was the
+// actual bug behind "movie of the day keeps switching randomly" while
+// adding titles). TV shows are excluded -- this is "Movie of the Day,"
+// not "Title of the Day."
 function pickMovieOfTheDay(movies: any[]) {
   const eligible = movies.filter((m) => m.media_type !== "tv");
   if (eligible.length === 0) return null;
-  const sorted = [...eligible].sort((a, b) => a.id.localeCompare(b.id));
-  const daysSinceEpoch = Math.floor(Date.now() / 86400000);
-  const index = daysSinceEpoch % sorted.length;
-  return sorted[index];
+  const todayStr = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+  return eligible.reduce((best, m) =>
+    hashString(m.id + todayStr) > hashString(best.id + todayStr) ? m : best
+  );
 }
 
 export default async function HomePage() {
