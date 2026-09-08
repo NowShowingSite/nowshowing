@@ -965,7 +965,7 @@ h1, h2, h3 {
 /* ---------- Movie of the Day ---------- */
 .motd-wrap {
   position: absolute;
-  top: 18px;
+  top: 9px;
   left: 24px;
   z-index: 5;
   max-width: 295px;
@@ -1165,7 +1165,7 @@ h1, h2, h3 {
 
 .movie-count {
   position: absolute;
-  top: 18px;
+  top: 9px;
   right: 24px;
   font-family: 'Space Mono', monospace;
   font-size: 0.7rem;
@@ -1199,7 +1199,7 @@ h1, h2, h3 {
 
 .filter-btn-row {
   position: absolute;
-  top: 78px;
+  top: 69px;
   right: 24px;
   display: flex;
   flex-direction: column;
@@ -1215,7 +1215,7 @@ h1, h2, h3 {
 .marquee-wrap {
   max-width: 960px;
   margin: 0 auto;
-  padding: 56px 24px 10px;
+  padding: 47px 24px 10px;
   text-align: center;
 }
 
