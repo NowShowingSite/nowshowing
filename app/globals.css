@@ -536,7 +536,7 @@ h1, h2, h3 {
   background-color: var(--surface);
   border: 1px solid var(--divider);
   border-radius: 12px;
-  max-width: min(96vw, 460px);
+  max-width: min(96vw, 420px);
   width: 100%;
   max-height: 88vh;
   overflow-y: auto;
