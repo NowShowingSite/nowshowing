@@ -1,5 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// TMDB names TV genres differently than movie genres (e.g. "Sci-Fi &
+// Fantasy" and "Action & Adventure" instead of separate "Science
+// Fiction"/"Fantasy" and "Action"/"Adventure"). This splits the TV
+// versions into the same atomic genre names movies use, so "By Genre"
+// browsing doesn't end up with duplicate near-identical buckets.
+function normalizeTvGenre(name: string): string[] {
+  const map: Record<string, string[]> = {
+    "Action & Adventure": ["Action", "Adventure"],
+    "Sci-Fi & Fantasy": ["Science Fiction", "Fantasy"],
+    "War & Politics": ["War"],
+  };
+  return map[name] ?? [name];
+}
+
 export async function GET(request: NextRequest) {
   const tmdbId = request.nextUrl.searchParams.get("id");
   const type = request.nextUrl.searchParams.get("type") === "tv" ? "tv" : "movie";
@@ -13,7 +27,9 @@ export async function GET(request: NextRequest) {
     );
     const data = await res.json();
 
-    const genre = (data.genres ?? []).map((g: any) => g.name).join(" / ");
+    const genre = (data.genres ?? [])
+      .flatMap((g: any) => normalizeTvGenre(g.name))
+      .join(" / ");
     const creators = (data.created_by ?? []).map((c: any) => c.name).join(" & ");
 
     const videos = data.videos?.results ?? [];
