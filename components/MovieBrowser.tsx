@@ -25,6 +25,45 @@ function ratingColor(avg: string) {
   return `hsl(${hue}, 70%, 50%)`;
 }
 
+// "By Genre" browsing uses a small fixed set of broad categories,
+// separate from a title's own displayed genre (which stays exactly
+// as TMDB provides it, e.g. "Sci-Fi & Fantasy / Drama"). Every raw
+// genre TMDB uses gets classified into one or more of these buckets,
+// so browsing doesn't fragment into near-duplicates like "Sci-Fi &
+// Fantasy" sitting next to "Science Fiction".
+const CANONICAL_GENRES = [
+  "Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary",
+  "Drama", "Family", "Fantasy", "History", "Horror", "Music", "Mystery",
+  "Romance", "Sci-Fi", "Thriller", "War", "Western",
+];
+
+const GENRE_MAP: Record<string, string[]> = {
+  "Science Fiction": ["Sci-Fi"],
+  "Sci-Fi & Fantasy": ["Sci-Fi", "Fantasy"],
+  "Action & Adventure": ["Action", "Adventure"],
+  "War & Politics": ["War"],
+  "Superhero": ["Action"],
+  "Kids": ["Family"],
+  "Soap": ["Drama"],
+  "News": ["Documentary"],
+  "Reality": ["Documentary"],
+  "TV Movie": ["Drama"],
+};
+
+function toCanonicalGenres(rawGenre?: string | null): string[] {
+  if (!rawGenre) return [];
+  const tokens = rawGenre.split("/").map((t) => t.trim()).filter(Boolean);
+  const result = new Set<string>();
+  for (const token of tokens) {
+    if (CANONICAL_GENRES.includes(token)) {
+      result.add(token);
+      continue;
+    }
+    (GENRE_MAP[token] ?? []).forEach((g) => result.add(g));
+  }
+  return Array.from(result);
+}
+
 type ModalView =
   | { kind: "genreList" }
   | { kind: "genreResults"; genre: string }
@@ -78,9 +117,9 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
 
   // Split each movie's "Action / Crime / Superhero" genre string into
   // individual genres, and collect the unique set across everything.
-  const allGenres = Array.from(
-    new Set(movies.flatMap((m) => (m.genre ? m.genre.split("/").map((g) => g.trim()) : [])))
-  ).sort();
+  const allGenres = CANONICAL_GENRES.filter((g) =>
+    movies.some((m) => toCanonicalGenres(m.genre).includes(g))
+  );
 
   const allDecades = Array.from(
     new Set(movies.filter((m) => m.year).map((m) => Math.floor((m.year as number) / 10) * 10))
@@ -95,9 +134,7 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
   }
 
   function genreMatches(genre: string) {
-    return sortByRatingDesc(
-      movies.filter((m) => m.genre?.split("/").map((g) => g.trim()).includes(genre))
-    );
+    return sortByRatingDesc(movies.filter((m) => toCanonicalGenres(m.genre).includes(genre)));
   }
 
   function decadeMatches(decade: number) {
@@ -125,7 +162,7 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
   function handleSurprise() {
     let candidates = movies;
     if (surpriseGenre !== "any") {
-      candidates = candidates.filter((m) => m.genre?.split("/").map((g) => g.trim()).includes(surpriseGenre));
+      candidates = candidates.filter((m) => toCanonicalGenres(m.genre).includes(surpriseGenre));
     }
     if (surpriseDecade !== "any") {
       const decade = parseInt(surpriseDecade);
