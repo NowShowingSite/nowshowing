@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
 
 type Item = {
   id: string;
@@ -32,6 +33,7 @@ export default function CountLink({
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  useBodyScrollLock(open);
 
   const filtered = movies
     .filter((m) => (mediaType === "tv" ? m.media_type === "tv" : m.media_type !== "tv"))
