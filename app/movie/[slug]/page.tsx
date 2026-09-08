@@ -4,6 +4,7 @@ import RatingForm from "@/components/RatingForm";
 import DirectorLink from "@/components/DirectorLink";
 import WatchlistToggle from "@/components/WatchlistToggle";
 import ChangePosterButton from "@/components/ChangePosterButton";
+import CollectionLink from "@/components/CollectionLink";
 
 // Same fix as the home page -- always check the database fresh,
 // never serve a stale snapshot from build time.
@@ -114,9 +115,7 @@ export default async function MovieDetailPage({
         {movie.collections && movie.collections.length > 0 && (
           <div className="collection-badge-stack">
             {movie.collections.map((c: string) => (
-              <Link key={c} href={`/collection/${encodeURIComponent(c)}`} className="collection-badge">
-                {c}
-              </Link>
+              <CollectionLink key={c} name={c} currentSlug={params.slug} />
             ))}
           </div>
         )}
