@@ -479,7 +479,7 @@ h1, h2, h3 {
 
 .stub-poster {
   width: 100%;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 2 / 3;
   background: linear-gradient(160deg, var(--surface-2), var(--surface));
 }
 
