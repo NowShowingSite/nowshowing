@@ -86,29 +86,39 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
   const [surpriseDecade, setSurpriseDecade] = useState("any");
   const [surpriseMessage, setSurpriseMessage] = useState("");
 
+  async function loadRecents() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setLoggedIn(false);
+      setRecentMovies([]);
+      return;
+    }
+    setLoggedIn(true);
+
+    const { data } = await supabase
+      .from("recent_searches")
+      .select("movie_id")
+      .eq("user_id", user.id)
+      .order("searched_at", { ascending: false })
+      .limit(16);
+
+    const movieById = Object.fromEntries(movies.map((m) => [m.id, m]));
+    const ordered = (data ?? [])
+      .map((r) => movieById[r.movie_id])
+      .filter(Boolean) as Movie[];
+    setRecentMovies(ordered);
+  }
+
   useEffect(() => {
-    (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setLoggedIn(false);
-        setRecentMovies([]);
-        return;
-      }
-      setLoggedIn(true);
+    loadRecents();
 
-      const { data } = await supabase
-        .from("recent_searches")
-        .select("movie_id")
-        .eq("user_id", user.id)
-        .order("searched_at", { ascending: false })
-        .limit(16);
-
-      const movieById = Object.fromEntries(movies.map((m) => [m.id, m]));
-      const ordered = (data ?? [])
-        .map((r) => movieById[r.movie_id])
-        .filter(Boolean) as Movie[];
-      setRecentMovies(ordered);
-    })();
+    // Without this, logging out (or into a different account) leaves
+    // the previous session's Recently Searched list sitting on screen,
+    // since this only used to run once when the page first mounted.
+    const { data: listener } = supabase.auth.onAuthStateChange(() => {
+      loadRecents();
+    });
+    return () => listener.subscription.unsubscribe();
   }, []);
 
   async function handleClearRecents() {
