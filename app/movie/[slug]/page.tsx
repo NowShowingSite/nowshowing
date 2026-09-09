@@ -1,10 +1,10 @@
 import { createClient } from "@/lib/supabaseClient";
-import Link from "next/link";
 import RatingForm from "@/components/RatingForm";
 import DirectorLink from "@/components/DirectorLink";
 import WatchlistToggle from "@/components/WatchlistToggle";
 import ChangePosterButton from "@/components/ChangePosterButton";
 import CollectionLink from "@/components/CollectionLink";
+import BackLink from "@/components/BackLink";
 
 // Same fix as the home page -- always check the database fresh,
 // never serve a stale snapshot from build time.
@@ -92,29 +92,21 @@ export default async function MovieDetailPage({
   if (error) {
     return (
       <div className="detail-wrap">
-        <Link href="/" className="back-link">
-          ← Back to search
-        </Link>
-        <p style={{ color: "salmon" }}>Error loading movie: {error}</p>
+        <BackLink />
       </div>
     );
   }
   if (!movie) {
     return (
       <div className="detail-wrap">
-        <Link href="/" className="back-link">
-          ← Back to search
-        </Link>
-        <p>Movie not found.</p>
+        <BackLink />
       </div>
     );
   }
 
   return (
     <div className="detail-wrap">
-      <Link href="/" className="back-link">
-        ← Back to search
-      </Link>
+      <BackLink />
       <div className="ticket">
         <WatchlistToggle
           tmdbId={movie.tmdb_id}
