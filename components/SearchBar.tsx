@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
+import { addGuestRecent } from "@/lib/guestRecents";
 
 type MovieOption = { id: string; slug: string; title: string; year: number | null; poster_url: string | null };
 
@@ -46,9 +47,9 @@ export default function SearchBar() {
     setQuery("");
     setOpen(false);
 
-    // Record this as a recent search, if logged in -- "upsert" so
-    // re-searching the same movie just bumps it to the top instead of
-    // creating a duplicate entry.
+    // Record this as a recent search. Logged in -> saved to your
+    // account (upsert so re-searching just bumps it to the top).
+    // Logged out -> kept in this browser session only.
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       await supabase
@@ -57,6 +58,8 @@ export default function SearchBar() {
           { user_id: user.id, movie_id: movie.id, searched_at: new Date().toISOString() },
           { onConflict: "user_id,movie_id" }
         );
+    } else {
+      addGuestRecent(movie.id);
     }
 
     router.push(`/movie/${movie.slug}`);

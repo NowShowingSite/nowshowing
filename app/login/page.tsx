@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
+import { getGuestRecents, clearGuestRecents } from "@/lib/guestRecents";
 
 export default function LoginPage() {
   const supabase = createClient();
@@ -45,6 +46,24 @@ export default function LoginPage() {
       }
     }
 
+    // If you searched for anything while logged out, fold those into
+    // your account's Recently Searched now -- they take the top spots
+    // (most recent first), shifting your existing list down rather
+    // than replacing it. Timestamps are spaced 1 second apart, walking
+    // backward from now, so the guest items land in the same relative
+    // order they were searched in.
+    const guestIds = getGuestRecents();
+    if (guestIds.length > 0) {
+      const now = Date.now();
+      const rows = guestIds.map((movieId, i) => ({
+        user_id: user.id,
+        movie_id: movieId,
+        searched_at: new Date(now - i * 1000).toISOString(),
+      }));
+      await supabase.from("recent_searches").upsert(rows, { onConflict: "user_id,movie_id" });
+      clearGuestRecents();
+    }
+
     router.push("/");
   }
 
@@ -66,6 +85,7 @@ export default function LoginPage() {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+        autoFocus
       />
       <input
         type="password"

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
 import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
+import { addGuestRecent, getGuestRecents, clearGuestRecents } from "@/lib/guestRecents";
 
 type Movie = {
   id: string;
@@ -90,7 +91,9 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       setLoggedIn(false);
-      setRecentMovies([]);
+      const movieById = Object.fromEntries(movies.map((m) => [m.id, m]));
+      const guestOrdered = getGuestRecents().map((id) => movieById[id]).filter(Boolean) as Movie[];
+      setRecentMovies(guestOrdered);
       return;
     }
     setLoggedIn(true);
@@ -123,8 +126,11 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
 
   async function handleClearRecents() {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    await supabase.from("recent_searches").delete().eq("user_id", user.id);
+    if (user) {
+      await supabase.from("recent_searches").delete().eq("user_id", user.id);
+    } else {
+      clearGuestRecents();
+    }
     setRecentMovies([]);
   }
 
@@ -197,6 +203,8 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
           { user_id: user.id, movie_id: movie.id, searched_at: new Date().toISOString() },
           { onConflict: "user_id,movie_id" }
         );
+    } else {
+      addGuestRecent(movie.id);
     }
 
     router.push(`/movie/${movie.slug}`);
@@ -380,8 +388,7 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
           )}
         </div>
 
-        {!loggedIn && <p>Log in and search for a movie to see it show up here.</p>}
-        {loggedIn && (recentMovies ?? []).length === 0 && (
+        {(recentMovies ?? []).length === 0 && (
           <p>Nothing searched yet — try the search bar above.</p>
         )}
 
