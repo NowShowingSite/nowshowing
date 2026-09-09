@@ -33,18 +33,23 @@ const fetchMoviesAndRatings = unstable_cache(
   async () => {
     const supabase = createClient();
 
-    const { data: movies, error } = await supabase
-      .from("movies")
-      .select("id, slug, title, year, poster_url, genre, media_type")
-      .order("title");
+    // These don't depend on each other -- ratings pulls every row
+    // unfiltered, not scoped to whatever movies came back. Running
+    // them together instead of one after another saves a full
+    // round-trip of latency.
+    const [moviesResult, ratingsResult] = await Promise.all([
+      supabase
+        .from("movies")
+        .select("id, slug, title, year, poster_url, genre, media_type")
+        .order("title"),
+      supabase.from("ratings").select("movie_id, score"),
+    ]);
 
+    const { data: movies, error } = moviesResult;
     if (error) {
       return { movies: [], error: error.message };
     }
-
-    // Fetch all ratings separately and group them by movie, rather than
-    // using a nested join (which was unreliable -- see movie detail page).
-    const { data: ratings } = await supabase.from("ratings").select("movie_id, score");
+    const { data: ratings } = ratingsResult;
 
     const scoresByMovie: Record<string, number[]> = {};
     (ratings ?? []).forEach((r) => {
