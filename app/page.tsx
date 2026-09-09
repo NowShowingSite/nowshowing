@@ -75,20 +75,27 @@ function hashString(s: string): number {
 }
 
 // Picks a movie for today deterministically. Each movie gets a score
-// of hash(its id + today's date), and whichever scores highest wins.
-// This is stable as the catalog grows: adding a new movie only changes
-// today's pick if that specific new movie happens to outscore the
-// current one -- unlike a modulo-based index, which reshuffles the
-// pick for EVERY movie whenever the total count changes (that was the
-// actual bug behind "movie of the day keeps switching randomly" while
-// adding titles). TV shows are excluded -- this is "Movie of the Day,"
-// not "Title of the Day."
+// of hash(today's date + its id), and whichever scores highest wins.
+// The date must come FIRST in that string -- this hash is a rolling
+// left-to-right accumulator, so later characters barely move the
+// final result. With the date appended at the end, the movie's own id
+// completely dominated the score and the date had almost no effect,
+// which is why the "daily" pick was actually stuck on the same movie
+// indefinitely. Putting the date first fixes that.
+//
+// This approach is also stable as the catalog grows: adding a new
+// movie only changes today's pick if that specific new movie happens
+// to outscore the current one -- unlike a modulo-based index, which
+// reshuffles the pick for EVERY movie whenever the total count changes
+// (that was the earlier bug behind "movie of the day keeps switching
+// randomly" while adding titles). TV shows are excluded -- this is
+// "Movie of the Day," not "Title of the Day."
 function pickMovieOfTheDay(movies: any[]) {
   const eligible = movies.filter((m) => m.media_type !== "tv");
   if (eligible.length === 0) return null;
   const todayStr = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
   return eligible.reduce((best, m) =>
-    hashString(m.id + todayStr) > hashString(best.id + todayStr) ? m : best
+    hashString(todayStr + m.id) > hashString(todayStr + best.id) ? m : best
   );
 }
 
