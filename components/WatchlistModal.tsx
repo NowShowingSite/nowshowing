@@ -88,6 +88,7 @@ export default function WatchlistModal() {
     if (!item.slug) return; // not in the shared catalog yet -- nothing to open
     setOpen(false);
     sessionStorage.setItem("reopenWatchlist", "1");
+    sessionStorage.removeItem("reopenBrowse");
     router.push(`/movie/${item.slug}`);
   }
 
