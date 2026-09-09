@@ -1388,9 +1388,23 @@ h1, h2, h3 {
 }
 
 /* ---------- Login box ---------- */
+.login-page-wrap {
+  min-height: calc(100vh - 60px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  cursor: default;
+}
+
+.login-page-content {
+  width: 100%;
+  max-width: 360px;
+}
+
 .login-box {
   max-width: 360px;
-  margin: 80px auto;
+  margin: 20px 0 0;
   padding: 32px;
   background: linear-gradient(180deg, var(--surface), var(--surface-2));
   border: 1px solid var(--divider);
