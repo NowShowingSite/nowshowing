@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
 import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
@@ -43,13 +43,39 @@ export default function RatingForm({
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  // "Your Score" -- only relevant for non-admins, since admins already
+  // appear in the Adam/Alex/Rob row above.
+  const [myScore, setMyScore] = useState<number | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("is_admin")
+        .eq("id", user.id)
+        .single();
+      if (!profile || profile.is_admin) return; // admins already shown above
+
+      const { data: rating } = await supabase
+        .from("ratings")
+        .select("score")
+        .eq("user_id", user.id)
+        .eq("movie_id", movieId)
+        .maybeSingle();
+      setMyScore(rating?.score ?? null);
+    })();
+  }, [movieId]);
+
   const hasRating = avg !== null;
   const avgText = hasRating ? formatRating(avg!) : "N/A";
   const badgeColor = hasRating ? ratingColor(avg) : "var(--text-muted)";
 
   async function handleOpenRate() {
     setError("");
-    setScoreInput("");
+    setScoreInput(myScore !== null ? formatRating(myScore) : "");
     const { data: { user } } = await supabase.auth.getUser();
     setNeedsLogin(!user);
     setRateOpen(true);
@@ -93,8 +119,10 @@ export default function RatingForm({
 
     setSubmitting(false);
     setRateOpen(false);
+    setMyScore(score);
     // The page's rating data is fetched server-side and won't know
-    // about this new rating on its own -- this re-runs that fetch.
+    // about this new rating on its own -- this re-runs that fetch
+    // (mainly matters if you're an admin, updating the official row).
     router.refresh();
   }
 
@@ -126,6 +154,18 @@ export default function RatingForm({
               </div>
             );
           })}
+
+        {expanded && myScore !== null && (
+          <div className="inline-score-item">
+            <div
+              className="inline-score-badge"
+              style={{ borderColor: ratingColor(myScore), color: ratingColor(myScore) }}
+            >
+              {formatRating(myScore)}
+            </div>
+            <span className="inline-score-name">User</span>
+          </div>
+        )}
 
         {hasRating && avg === 10 && (
           <div className="perfect-score">Perfect<br />Score</div>
