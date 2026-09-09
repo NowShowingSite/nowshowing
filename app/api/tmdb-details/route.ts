@@ -63,19 +63,28 @@ export async function GET(request: NextRequest) {
   const trailerUrl = trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : null;
 
   // TMDB's top-level "release_date" is whichever country released it
-  // FIRST globally, not necessarily the US date. Look up the US entry
-  // for an actual theatrical release (type 2 = limited, type 3 = wide)
-  // and use that instead -- but only if one genuinely exists. Older
-  // catalog titles often have no US theatrical entry at all, just a
-  // home video reissue (type 4/5/6) dated decades later; grabbing
-  // "whatever's first" for those was the bug behind wrong years like
-  // Rear Window (1954) showing a much later date. When there's no
-  // real theatrical entry, the global release_date is more trustworthy.
+  // FIRST globally, not necessarily the US date. Look up the US
+  // theatrical entries (type 2 = limited, type 3 = wide) instead --
+  // but a classic film can have MULTIPLE "theatrical" entries (its
+  // original release AND a modern anniversary re-release), so take
+  // the earliest one, not just whichever appears first in the list.
+  // As a backstop, only trust it if it's reasonably close to the
+  // globally-listed date -- if it's off by years, the global date is
+  // more likely the real original release.
   let releaseDate = data.release_date || null;
   const usEntry = (data.release_dates?.results ?? []).find((r: any) => r.iso_3166_1 === "US");
-  const usTheatrical = usEntry?.release_dates?.find((rd: any) => rd.type === 3 || rd.type === 2);
-  if (usTheatrical) {
-    releaseDate = usTheatrical.release_date.slice(0, 10);
+  const usTheatricalDates = (usEntry?.release_dates ?? [])
+    .filter((rd: any) => rd.type === 3 || rd.type === 2)
+    .map((rd: any) => rd.release_date.slice(0, 10))
+    .sort();
+
+  if (usTheatricalDates.length > 0) {
+    const earliestUs = usTheatricalDates[0];
+    const globalYear = releaseDate ? parseInt(releaseDate.slice(0, 4)) : null;
+    const usYear = parseInt(earliestUs.slice(0, 4));
+    if (globalYear === null || Math.abs(usYear - globalYear) <= 2) {
+      releaseDate = earliestUs;
+    }
   }
 
   return NextResponse.json({
