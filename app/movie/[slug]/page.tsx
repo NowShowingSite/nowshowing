@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabaseClient";
+import Image from "next/image";
 import RatingForm from "@/components/RatingForm";
 import DirectorLink from "@/components/DirectorLink";
 import WatchlistToggle from "@/components/WatchlistToggle";
@@ -127,7 +128,7 @@ export default async function MovieDetailPage({
           <div className="poster-col">
             <div className="ticket-poster">
               {movie.poster_url ? (
-                <img src={movie.poster_url} alt="" />
+                <Image src={movie.poster_url} alt="" fill sizes="180px" style={{ objectFit: "contain" }} />
               ) : (
                 "No poster yet"
               )}

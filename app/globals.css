@@ -169,6 +169,7 @@ h1, h2, h3 {
   font-family: 'Space Mono', monospace;
   font-size: 0.75rem;
   text-align: center;
+  position: relative;
 }
 
 .ticket-poster img {
@@ -481,6 +482,7 @@ h1, h2, h3 {
   width: 100%;
   aspect-ratio: 2 / 3;
   background: linear-gradient(160deg, var(--surface-2), var(--surface));
+  position: relative;
 }
 
 .stub-poster img {
@@ -823,11 +825,12 @@ h1, h2, h3 {
 .poster-pick-thumb {
   width: 100%;
   aspect-ratio: 2 / 3;
-  object-fit: cover;
   border-radius: 6px;
   cursor: pointer;
   border: 2px solid transparent;
   transition: border-color 0.15s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .poster-pick-thumb:hover {

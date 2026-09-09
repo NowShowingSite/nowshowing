@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabaseClient";
 import { unstable_cache } from "next/cache";
 import Link from "next/link";
+import Image from "next/image";
 import SearchBar from "@/components/SearchBar";
 import UpcomingReleases from "@/components/UpcomingReleases";
 import MovieBrowser from "@/components/MovieBrowser";
@@ -127,7 +128,9 @@ export default async function HomePage() {
           <div className="motd-wrap">
             <Link href={`/movie/${motd.slug}`} className="motd-box">
               <div className="motd-poster">
-                {motd.poster_url && <img src={motd.poster_url} alt="" />}
+                {motd.poster_url && (
+                  <Image src={motd.poster_url} alt="" width={63} height={95} />
+                )}
               </div>
               <div className="motd-text">
                 <span className="motd-label">Movie of the Day</span>

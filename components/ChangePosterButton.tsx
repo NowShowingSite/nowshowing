@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { createClient } from "@/lib/supabaseClient";
 import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
 import { useAuth } from "@/lib/AuthContext";
@@ -68,14 +69,14 @@ export default function ChangePosterButton({
             {posters && posters.length > 0 && (
               <div className="poster-pick-grid">
                 {posters.map((p, i) => (
-                  <img
+                  <div
                     key={i}
-                    src={p.url}
-                    alt=""
                     className="poster-pick-thumb"
                     style={{ opacity: saving ? 0.5 : 1, pointerEvents: saving ? "none" : "auto" }}
                     onClick={() => handlePick(p.url)}
-                  />
+                  >
+                    <Image src={p.url} alt="" fill sizes="120px" style={{ objectFit: "cover" }} />
+                  </div>
                 ))}
               </div>
             )}

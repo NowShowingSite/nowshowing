@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
 import { addGuestRecent } from "@/lib/guestRecents";
@@ -108,7 +109,7 @@ export default function SearchBar() {
                 onMouseEnter={() => setHighlighted(i)}
               >
                 <div className="d-thumb">
-                  {m.poster_url && <img src={m.poster_url} alt="" />}
+                  {m.poster_url && <Image src={m.poster_url} alt="" width={32} height={44} />}
                 </div>
                 <div className="d-info">
                   <span className="d-title">{m.title}</span>

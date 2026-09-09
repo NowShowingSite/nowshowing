@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
 import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
@@ -403,7 +404,9 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
           {(recentMovies ?? []).map((movie) => (
             <Link key={movie.id} href={`/movie/${movie.slug}`} className="stub">
               <div className="stub-poster">
-                {movie.poster_url && <img src={movie.poster_url} alt="" />}
+                {movie.poster_url && (
+                  <Image src={movie.poster_url} alt="" fill sizes="140px" style={{ objectFit: "cover" }} />
+                )}
               </div>
               <div className="stub-body">
                 <p className="stub-title">{movie.title}</p>
