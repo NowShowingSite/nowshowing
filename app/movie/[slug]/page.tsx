@@ -41,29 +41,39 @@ function getTitleFontSize(title: string): string | undefined {
 async function getMovie(slug: string) {
   const supabase = createClient();
 
-  const { data: movie, error } = await supabase
-    .from("movies")
-    .select("id, title, year, year_end, genre, director, creator, runtime, poster_url, tmdb_id, collections, trailer_url, media_type")
-    .eq("slug", slug)
-    .single();
+  // These two don't depend on each other at all -- fetching them one
+  // after another was wasting a full round-trip of latency for no
+  // reason. Running them at the same time gets both back in roughly
+  // the time of the slower one, instead of the sum of both.
+  const [movieResult, adminsResult] = await Promise.all([
+    supabase
+      .from("movies")
+      .select("id, title, year, year_end, genre, director, creator, runtime, poster_url, tmdb_id, collections, trailer_url, media_type")
+      .eq("slug", slug)
+      .single(),
+    // The site's "official" score is the average of just the admin
+    // accounts (Adam/Alex/Rob) -- everyone else's ratings are tracked
+    // separately and shown elsewhere.
+    supabase
+      .from("profiles")
+      .select("id, username")
+      .eq("is_admin", true)
+      .order("created_at", { ascending: true }),
+  ]);
+
+  const { data: movie, error } = movieResult;
+  const { data: admins } = adminsResult;
 
   if (error || !movie) {
     return { movie: null, error: error?.message ?? null, avg: null, adminBreakdown: [] };
   }
 
-  // The site's "official" score is the average of just the admin
-  // accounts (Adam/Alex/Rob) -- everyone else's ratings are tracked
-  // separately and shown elsewhere.
-  const { data: admins } = await supabase
-    .from("profiles")
-    .select("id, username")
-    .eq("is_admin", true)
-    .order("created_at", { ascending: true });
-
   const adminIds = (admins ?? []).map((a) => a.id);
 
   let scoreByAdmin: Record<string, number> = {};
   if (adminIds.length > 0) {
+    // This one genuinely has to wait -- it needs both movie.id and
+    // adminIds, which only exist once the fetch above finishes.
     const { data: adminRatings } = await supabase
       .from("ratings")
       .select("user_id, score")
