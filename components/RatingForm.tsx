@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
 import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
+import { useAuth } from "@/lib/AuthContext";
 
 // Red at 0, green at 10, yellow in between.
 function ratingColor(score: number | null) {
@@ -33,12 +34,12 @@ export default function RatingForm({
 }) {
   const supabase = createClient();
   const router = useRouter();
+  const { loading: authLoading, userId, isAdmin } = useAuth();
 
   const [expanded, setExpanded] = useState(false);
 
   const [rateOpen, setRateOpen] = useState(false);
   useBodyScrollLock(rateOpen);
-  const [needsLogin, setNeedsLogin] = useState(false);
   const [scoreInput, setScoreInput] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -48,40 +49,32 @@ export default function RatingForm({
   const [myScore, setMyScore] = useState<number | null>(null);
 
   useEffect(() => {
+    if (authLoading || !userId || isAdmin) return; // admins already shown above
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("is_admin")
-        .eq("id", user.id)
-        .single();
-      if (!profile || profile.is_admin) return; // admins already shown above
-
       const { data: rating } = await supabase
         .from("ratings")
         .select("score")
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .eq("movie_id", movieId)
         .maybeSingle();
       setMyScore(rating?.score ?? null);
     })();
-  }, [movieId]);
+  }, [movieId, userId, isAdmin, authLoading]);
 
   const hasRating = avg !== null;
   const avgText = hasRating ? formatRating(avg!) : "N/A";
   const badgeColor = hasRating ? ratingColor(avg) : "var(--text-muted)";
+  const needsLogin = !authLoading && !userId;
 
-  async function handleOpenRate() {
+  function handleOpenRate() {
     setError("");
     setScoreInput(myScore !== null ? formatRating(myScore) : "");
-    const { data: { user } } = await supabase.auth.getUser();
-    setNeedsLogin(!user);
     setRateOpen(true);
   }
 
   async function handleSubmit() {
+    if (!userId) return;
+
     const score = parseFloat(scoreInput);
     if (isNaN(score) || score < 0 || score > 10) {
       setError("Enter a number between 0 and 10.");
@@ -89,19 +82,13 @@ export default function RatingForm({
     }
 
     setSubmitting(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      setNeedsLogin(true);
-      setSubmitting(false);
-      return;
-    }
 
     // "upsert" means: insert a new rating, or update it if this user
     // already rated this movie (matches the unique constraint in the DB).
     const { error: upsertError } = await supabase
       .from("ratings")
       .upsert(
-        { user_id: user.id, movie_id: movieId, score },
+        { user_id: userId, movie_id: movieId, score },
         { onConflict: "user_id,movie_id" }
       );
 
@@ -114,7 +101,7 @@ export default function RatingForm({
     // If this movie was on your watchlist, rating it means you've now
     // watched it -- so clear it off automatically.
     if (tmdbId) {
-      await supabase.from("watchlist").delete().eq("user_id", user.id).eq("tmdb_id", tmdbId);
+      await supabase.from("watchlist").delete().eq("user_id", userId).eq("tmdb_id", tmdbId);
     }
 
     setSubmitting(false);

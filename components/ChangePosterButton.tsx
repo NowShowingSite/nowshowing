@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
 import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
+import { useAuth } from "@/lib/AuthContext";
 
 type Poster = { url: string; language: string | null };
 
@@ -18,25 +19,12 @@ export default function ChangePosterButton({
 }) {
   const supabase = createClient();
   const router = useRouter();
+  const { isAdmin } = useAuth();
 
-  const [isAdmin, setIsAdmin] = useState(false);
   const [open, setOpen] = useState(false);
   useBodyScrollLock(open);
   const [posters, setPosters] = useState<Poster[] | null>(null); // null = loading
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("is_admin")
-        .eq("id", user.id)
-        .single();
-      setIsAdmin(profile?.is_admin ?? false);
-    })();
-  }, []);
 
   async function handleOpen() {
     setOpen(true);

@@ -1,5 +1,6 @@
 import "./globals.css";
 import AuthStatus from "@/components/AuthStatus";
+import { AuthProvider } from "@/lib/AuthContext";
 
 export const metadata = {
   title: "Now Showing",
@@ -14,11 +15,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <header className="site-header">
-          <div />
-          <AuthStatus />
-        </header>
-        <main>{children}</main>
+        <AuthProvider>
+          <header className="site-header">
+            <div />
+            <AuthStatus />
+          </header>
+          <main>{children}</main>
+        </AuthProvider>
       </body>
     </html>
   );

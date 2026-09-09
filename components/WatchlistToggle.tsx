@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabaseClient";
+import { useAuth } from "@/lib/AuthContext";
 
 export default function WatchlistToggle({
   tmdbId,
@@ -19,31 +20,24 @@ export default function WatchlistToggle({
   posterUrl: string | null;
 }) {
   const supabase = createClient();
-  const [userId, setUserId] = useState<string | null>(null);
+  const { loading: authLoading, userId } = useAuth();
   const [onWatchlist, setOnWatchlist] = useState(false);
-  const [ready, setReady] = useState(false);
+  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    if (!tmdbId) return;
+    if (authLoading || !tmdbId || !userId) return;
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setReady(true);
-        return;
-      }
-      setUserId(user.id);
-
       const { data } = await supabase
         .from("watchlist")
         .select("id")
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .eq("tmdb_id", tmdbId)
         .maybeSingle();
 
       setOnWatchlist(!!data);
-      setReady(true);
+      setChecked(true);
     })();
-  }, [tmdbId]);
+  }, [tmdbId, userId, authLoading]);
 
   async function toggle() {
     if (!userId || !tmdbId) return;
@@ -67,7 +61,7 @@ export default function WatchlistToggle({
 
   // No account signed in, or this movie predates tmdb_id tracking --
   // nothing sensible to toggle, so render nothing.
-  if (!ready || !userId || !tmdbId) return null;
+  if (authLoading || !userId || !tmdbId || !checked) return null;
 
   return (
     <button
