@@ -74,29 +74,33 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="login-box">
-      <Link href="/" className="back-link">
-        ← Back to search
-      </Link>
-      <h2>Login / Sign up</h2>
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-        autoFocus
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-      />
-      <button onClick={handleLogin}>Log in</button>
-      <button onClick={handleSignUp}>Sign up</button>
-      {message && <p>{message}</p>}
+    <div className="login-page-wrap" onClick={() => router.back()}>
+      <div className="login-page-content" onClick={(e) => e.stopPropagation()}>
+        <Link href="/" className="back-link">
+          ← Back to search
+        </Link>
+        <div className="login-box">
+          <h2>Login / Sign up</h2>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+            autoFocus
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+          />
+          <button onClick={handleLogin}>Log in</button>
+          <button onClick={handleSignUp}>Sign up</button>
+          {message && <p>{message}</p>}
+        </div>
+      </div>
     </div>
   );
 }
