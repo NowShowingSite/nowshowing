@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
 import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
 
@@ -75,6 +75,7 @@ type ModalView =
 export default function MovieBrowser({ movies }: { movies: Movie[] }) {
   const supabase = createClient();
   const router = useRouter();
+  const pathname = usePathname();
 
   const [loggedIn, setLoggedIn] = useState(false);
   const [recentMovies, setRecentMovies] = useState<Movie[] | null>(null); // null = still loading
@@ -117,6 +118,23 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
     setRecentMovies([]);
   }
 
+  // If we navigated to a movie FROM a genre/decade results list, coming
+  // back here (via that movie's "Back to X" link) should reopen the
+  // same list, rather than leaving you at a closed home page.
+  useEffect(() => {
+    if (pathname !== "/") return;
+    const raw = sessionStorage.getItem("reopenBrowse");
+    if (!raw) return;
+    sessionStorage.removeItem("reopenBrowse");
+    try {
+      const ctx = JSON.parse(raw);
+      if (ctx.kind === "genre") setModal({ kind: "genreResults", genre: ctx.value });
+      else if (ctx.kind === "decade") setModal({ kind: "decadeResults", decade: ctx.value });
+    } catch {
+      // ignore malformed/stale value
+    }
+  }, [pathname]);
+
   // Split each movie's "Action / Crime / Superhero" genre string into
   // individual genres, and collect the unique set across everything.
   const allGenres = CANONICAL_GENRES.filter((g) =>
@@ -144,6 +162,19 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
   }
 
   async function goToMovie(movie: Movie) {
+    // Remember where we came from, so the movie page's back link can
+    // return here and reopen the same results list, instead of just
+    // landing on a plain home page.
+    if (modal?.kind === "genreResults") {
+      sessionStorage.setItem("reopenBrowse", JSON.stringify({ kind: "genre", value: modal.genre }));
+      sessionStorage.removeItem("reopenWatchlist");
+    } else if (modal?.kind === "decadeResults") {
+      sessionStorage.setItem("reopenBrowse", JSON.stringify({ kind: "decade", value: modal.decade }));
+      sessionStorage.removeItem("reopenWatchlist");
+    } else {
+      sessionStorage.removeItem("reopenBrowse");
+    }
+
     setModal(null);
 
     // Record this the same way clicking a search result does, so it
