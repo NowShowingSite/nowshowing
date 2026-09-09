@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
 import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
 
@@ -18,6 +18,7 @@ type WatchlistItem = {
 export default function WatchlistModal() {
   const supabase = createClient();
   const router = useRouter();
+  const pathname = usePathname();
 
   const [open, setOpen] = useState(false);
   useBodyScrollLock(open);
@@ -68,6 +69,16 @@ export default function WatchlistModal() {
     loadWatchlist();
   }
 
+  // If we navigated to a movie FROM the watchlist, coming back here
+  // (via that movie's "Back to Watchlist" link) should reopen it
+  // automatically, rather than leaving you back at a closed home page.
+  useEffect(() => {
+    if (pathname === "/" && sessionStorage.getItem("reopenWatchlist")) {
+      sessionStorage.removeItem("reopenWatchlist");
+      handleOpen();
+    }
+  }, [pathname]);
+
   async function handleRemove(id: string) {
     await supabase.from("watchlist").delete().eq("id", id);
     setItems((prev) => (prev ? prev.filter((i) => i.id !== id) : prev));
@@ -76,6 +87,7 @@ export default function WatchlistModal() {
   function goToItem(item: WatchlistItem) {
     if (!item.slug) return; // not in the shared catalog yet -- nothing to open
     setOpen(false);
+    sessionStorage.setItem("reopenWatchlist", "1");
     router.push(`/movie/${item.slug}`);
   }
 
