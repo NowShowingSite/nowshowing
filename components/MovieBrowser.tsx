@@ -368,7 +368,14 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
       </div>
 
       {modal && (
-        <div className="modal-overlay" onClick={() => setModal(null)}>
+        <div
+          className="modal-overlay"
+          onClick={() => {
+            if (modal?.kind === "genreResults") setModal({ kind: "genreList" });
+            else if (modal?.kind === "decadeResults") setModal({ kind: "decadeList" });
+            else setModal(null);
+          }}
+        >
           <div className="modal-card" onClick={(e) => e.stopPropagation()}>
             <button className="modal-close" aria-label="Close" onClick={() => setModal(null)}>
               &times;
