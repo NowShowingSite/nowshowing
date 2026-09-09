@@ -64,13 +64,18 @@ export async function GET(request: NextRequest) {
 
   // TMDB's top-level "release_date" is whichever country released it
   // FIRST globally, not necessarily the US date. Look up the US entry
-  // specifically instead, preferring a theatrical release (type 3) if
-  // there's more than one US date listed.
+  // for an actual theatrical release (type 2 = limited, type 3 = wide)
+  // and use that instead -- but only if one genuinely exists. Older
+  // catalog titles often have no US theatrical entry at all, just a
+  // home video reissue (type 4/5/6) dated decades later; grabbing
+  // "whatever's first" for those was the bug behind wrong years like
+  // Rear Window (1954) showing a much later date. When there's no
+  // real theatrical entry, the global release_date is more trustworthy.
   let releaseDate = data.release_date || null;
   const usEntry = (data.release_dates?.results ?? []).find((r: any) => r.iso_3166_1 === "US");
-  if (usEntry?.release_dates?.length) {
-    const theatrical = usEntry.release_dates.find((rd: any) => rd.type === 3);
-    releaseDate = (theatrical ?? usEntry.release_dates[0]).release_date.slice(0, 10);
+  const usTheatrical = usEntry?.release_dates?.find((rd: any) => rd.type === 3 || rd.type === 2);
+  if (usTheatrical) {
+    releaseDate = usTheatrical.release_date.slice(0, 10);
   }
 
   return NextResponse.json({
