@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabaseClient";
+import { unstable_cache } from "next/cache";
 import Link from "next/link";
 import SearchBar from "@/components/SearchBar";
 import UpcomingReleases from "@/components/UpcomingReleases";
@@ -7,8 +8,10 @@ import CountLink from "@/components/CountLink";
 
 // Without this, Next.js would "bake in" whatever the database looked
 // like at build time and serve that same snapshot to everyone until
-// the next deploy. This forces it to check the database fresh every
-// time someone visits the page.
+// the next deploy. This forces the PAGE itself to always render fresh
+// per request. The underlying data fetch below is separately cached
+// for a short window via unstable_cache -- so the page still renders
+// live every time, but doesn't necessarily hit the database every time.
 export const dynamic = "force-dynamic";
 
 // Keeps up to 2 decimal places, but trims trailing zeros -- 9.50
@@ -17,42 +20,54 @@ function formatRating(n: number) {
   return parseFloat(n.toFixed(2)).toString();
 }
 
-// This runs on the server each time the page loads, fetching the
-// current list of movies and their ratings straight from Supabase.
+// The actual database round-trip -- movies + every rating, needed to
+// compute averages. This was being run fresh on literally every single
+// visit to the home page, even if the last visitor loaded the exact
+// same thing a second ago. Wrapping it in unstable_cache means it's
+// only actually re-run once every 30 seconds; visitors in between get
+// an instant cached result instead of waiting on a fresh fetch.
+// Search, a movie's own page, watchlist, and Recently Searched are all
+// separate queries elsewhere and are NOT affected by this cache.
+const fetchMoviesAndRatings = unstable_cache(
+  async () => {
+    const supabase = createClient();
+
+    const { data: movies, error } = await supabase
+      .from("movies")
+      .select("id, slug, title, year, poster_url, genre, media_type")
+      .order("title");
+
+    if (error) {
+      return { movies: [], error: error.message };
+    }
+
+    // Fetch all ratings separately and group them by movie, rather than
+    // using a nested join (which was unreliable -- see movie detail page).
+    const { data: ratings } = await supabase.from("ratings").select("movie_id, score");
+
+    const scoresByMovie: Record<string, number[]> = {};
+    (ratings ?? []).forEach((r) => {
+      if (!scoresByMovie[r.movie_id]) scoresByMovie[r.movie_id] = [];
+      scoresByMovie[r.movie_id].push(r.score);
+    });
+
+    const mapped = (movies ?? []).map((movie) => {
+      const scores = scoresByMovie[movie.id] ?? [];
+      const avg =
+        scores.length > 0
+          ? formatRating(scores.reduce((a, b) => a + b, 0) / scores.length)
+          : "—";
+      return { ...movie, avg, count: scores.length };
+    });
+
+    return { movies: mapped, error: null };
+  },
+  ["home-movies-and-ratings"],
+  { revalidate: 30 }
+);
+
 async function getMovies() {
-  const supabase = createClient();
-
-  const { data: movies, error } = await supabase
-    .from("movies")
-    .select("id, slug, title, year, poster_url, genre, media_type")
-    .order("title");
-
-  if (error) {
-    // Return the error itself so the page can show exactly what
-    // went wrong, instead of silently displaying "no movies."
-    return { movies: [], error: error.message };
-  }
-
-  // Fetch all ratings separately and group them by movie, rather than
-  // using a nested join (which was unreliable -- see movie detail page).
-  const { data: ratings } = await supabase.from("ratings").select("movie_id, score");
-
-  const scoresByMovie: Record<string, number[]> = {};
-  (ratings ?? []).forEach((r) => {
-    if (!scoresByMovie[r.movie_id]) scoresByMovie[r.movie_id] = [];
-    scoresByMovie[r.movie_id].push(r.score);
-  });
-
-  const mapped = (movies ?? []).map((movie) => {
-    const scores = scoresByMovie[movie.id] ?? [];
-    const avg =
-      scores.length > 0
-        ? formatRating(scores.reduce((a, b) => a + b, 0) / scores.length)
-        : "—";
-    return { ...movie, avg, count: scores.length };
-  });
-
-  return { movies: mapped, error: null };
+  return fetchMoviesAndRatings();
 }
 
 // Red at 0, green at 10, yellow in between -- same scale used everywhere
