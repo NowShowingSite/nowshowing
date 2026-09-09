@@ -27,9 +27,23 @@ export default function AuthStatus() {
     });
 
     // Keep this in sync if the user logs in/out in another tab, or
-    // right after submitting the login form.
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    // right after submitting the login form. This is what was missing
+    // before -- it used to only update the email, not admin status, so
+    // logging in on a page where the header was already mounted (e.g.
+    // navigating from /login to /) could leave "Add Movie/TV" hidden
+    // until a manual refresh re-ran the initial admin check.
+    const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setEmail(session?.user?.email ?? null);
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("is_admin")
+          .eq("id", session.user.id)
+          .single();
+        setIsAdmin(profile?.is_admin ?? false);
+      } else {
+        setIsAdmin(false);
+      }
     });
 
     return () => listener.subscription.unsubscribe();
