@@ -245,7 +245,7 @@ h1, h2, h3 {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin: 0 0 22px;
+  margin: 0 0 8px;
 }
 
 .inline-score-item {
@@ -284,7 +284,7 @@ h1, h2, h3 {
 
 .rate-your-score-link {
   display: inline-block;
-  margin-top: 10px;
+  margin-top: 4px;
   color: var(--text);
   font-family: 'Space Mono', monospace;
   font-size: 0.75rem;
