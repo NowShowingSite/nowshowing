@@ -26,11 +26,13 @@ export default function RatingForm({
   tmdbId,
   avg,
   adminBreakdown,
+  userAvg,
 }: {
   movieId: string;
   tmdbId?: number | null;
   avg: number | null;
   adminBreakdown: AdminScore[];
+  userAvg: number | null;
 }) {
   const supabase = createClient();
   const router = useRouter();
@@ -142,7 +144,19 @@ export default function RatingForm({
             );
           })}
 
-        {expanded && myScore !== null && (
+        {expanded && isAdmin && userAvg !== null && (
+          <div className="inline-score-item">
+            <div
+              className="inline-score-badge"
+              style={{ borderColor: ratingColor(userAvg), color: ratingColor(userAvg) }}
+            >
+              {formatRating(userAvg)}
+            </div>
+            <span className="inline-score-name">Users</span>
+          </div>
+        )}
+
+        {expanded && !isAdmin && myScore !== null && (
           <div className="inline-score-item">
             <div
               className="inline-score-badge"
