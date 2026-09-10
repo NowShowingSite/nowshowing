@@ -70,22 +70,28 @@ async function getMovie(slug: string) {
   const { data: admins } = adminsResult;
 
   if (error || !movie) {
-    return { movie: null, error: error?.message ?? null, avg: null, adminBreakdown: [] };
+    return { movie: null, error: error?.message ?? null, avg: null, adminBreakdown: [], userAvg: null };
   }
 
   const adminIds = (admins ?? []).map((a) => a.id);
+  const adminIdSet = new Set(adminIds);
 
-  let scoreByAdmin: Record<string, number> = {};
-  if (adminIds.length > 0) {
-    // This one genuinely has to wait -- it needs both movie.id and
-    // adminIds, which only exist once the fetch above finishes.
-    const { data: adminRatings } = await supabase
-      .from("ratings")
-      .select("user_id, score")
-      .eq("movie_id", movie.id)
-      .in("user_id", adminIds);
-    scoreByAdmin = Object.fromEntries((adminRatings ?? []).map((r) => [r.user_id, r.score]));
-  }
+  // One query gets everything needed for both the admin breakdown AND
+  // the non-admin average -- no need for two separate fetches.
+  const { data: allRatings } = await supabase
+    .from("ratings")
+    .select("user_id, score")
+    .eq("movie_id", movie.id);
+
+  const scoreByAdmin: Record<string, number> = {};
+  const nonAdminScores: number[] = [];
+  (allRatings ?? []).forEach((r) => {
+    if (adminIdSet.has(r.user_id)) {
+      scoreByAdmin[r.user_id] = r.score;
+    } else {
+      nonAdminScores.push(r.score);
+    }
+  });
 
   const adminBreakdown = (admins ?? []).map((a) => ({
     username: a.username,
@@ -95,7 +101,15 @@ async function getMovie(slug: string) {
   const ratedScores = adminBreakdown.filter((a) => a.score !== null).map((a) => a.score as number);
   const avg = ratedScores.length > 0 ? ratedScores.reduce((sum, s) => sum + s, 0) / ratedScores.length : null;
 
-  return { movie, error: null, avg, adminBreakdown };
+  // Only relevant to admins viewing the page -- everyone else instead
+  // sees their own personal score in that same slot (handled client-
+  // side in RatingForm, since it depends on who's actually looking).
+  const userAvg =
+    nonAdminScores.length > 0
+      ? nonAdminScores.reduce((sum, s) => sum + s, 0) / nonAdminScores.length
+      : null;
+
+  return { movie, error: null, avg, adminBreakdown, userAvg };
 }
 
 export default async function MovieDetailPage({
@@ -103,7 +117,7 @@ export default async function MovieDetailPage({
 }: {
   params: { slug: string };
 }) {
-  const { movie, error, avg, adminBreakdown } = await getMovie(params.slug);
+  const { movie, error, avg, adminBreakdown, userAvg } = await getMovie(params.slug);
 
   if (error) {
     return (
@@ -161,7 +175,7 @@ export default async function MovieDetailPage({
                 breakdown, or use the small link below to submit your own
                 score. This is a client component since it needs to know
                 who's logged in. */}
-            <RatingForm movieId={movie.id} tmdbId={movie.tmdb_id} avg={avg} adminBreakdown={adminBreakdown} />
+            <RatingForm movieId={movie.id} tmdbId={movie.tmdb_id} avg={avg} adminBreakdown={adminBreakdown} userAvg={userAvg} />
 
             <h1 className="detail-title" style={{ fontSize: getTitleFontSize(movie.title) }}>
               {movie.title}
