@@ -1405,6 +1405,14 @@ h1, h2, h3 {
   cursor: default;
 }
 
+.click-back-inner {
+  pointer-events: none;
+}
+
+.click-back-inner > * {
+  pointer-events: auto;
+}
+
 .login-page-content {
   width: 100%;
   max-width: 360px;
