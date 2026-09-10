@@ -8,25 +8,18 @@ import { addGuestRecent } from "@/lib/guestRecents";
 
 type MovieOption = { id: string; slug: string; title: string; year: number | null; poster_url: string | null };
 
-export default function SearchBar() {
+// The home page already fetches the full movie list server-side --
+// this used to independently re-fetch that exact same list client-
+// side on every page load, which was a wasted duplicate round-trip.
+// Receiving it as a prop instead reuses what's already there.
+export default function SearchBar({ movies }: { movies: MovieOption[] }) {
   const supabase = createClient();
   const router = useRouter();
   const boxRef = useRef<HTMLDivElement>(null);
 
-  const [allMovies, setAllMovies] = useState<MovieOption[]>([]);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [highlighted, setHighlighted] = useState(0);
-
-  // Load the movie list once -- the dataset is small enough that
-  // filtering it in the browser as you type is instant, same as the
-  // original static site did.
-  useEffect(() => {
-    supabase
-      .from("movies")
-      .select("id, slug, title, year, poster_url")
-      .then(({ data }) => setAllMovies(data ?? []));
-  }, []);
 
   // Close the dropdown if you click outside it.
   useEffect(() => {
@@ -41,7 +34,7 @@ export default function SearchBar() {
 
   const q = query.trim().toLowerCase();
   const results = q
-    ? allMovies.filter((m) => m.title.toLowerCase().includes(q)).slice(0, 8)
+    ? movies.filter((m) => m.title.toLowerCase().includes(q)).slice(0, 8)
     : [];
 
   async function goToMovie(movie: MovieOption) {

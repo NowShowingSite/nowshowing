@@ -167,7 +167,7 @@ export default async function HomePage() {
           <UpcomingReleases />
         </div>
 
-        <SearchBar />
+        <SearchBar movies={movies} />
         {error && (
           <p style={{ color: "salmon", padding: "0 24px", maxWidth: 720, margin: "0 auto" }}>
             Error loading movies: {error}

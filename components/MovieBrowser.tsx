@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
 import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
+import { useAuth } from "@/lib/AuthContext";
 import { addGuestRecent, getGuestRecents, clearGuestRecents } from "@/lib/guestRecents";
 
 type Movie = {
@@ -78,8 +79,8 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
   const supabase = createClient();
   const router = useRouter();
   const pathname = usePathname();
+  const { loading: authLoading, userId } = useAuth();
 
-  const [loggedIn, setLoggedIn] = useState(false);
   const [recentMovies, setRecentMovies] = useState<Movie[] | null>(null); // null = still loading
 
   const [modal, setModal] = useState<ModalView | null>(null);
@@ -89,20 +90,17 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
   const [surpriseMessage, setSurpriseMessage] = useState("");
 
   async function loadRecents() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      setLoggedIn(false);
+    if (!userId) {
       const movieById = Object.fromEntries(movies.map((m) => [m.id, m]));
       const guestOrdered = getGuestRecents().map((id) => movieById[id]).filter(Boolean) as Movie[];
       setRecentMovies(guestOrdered);
       return;
     }
-    setLoggedIn(true);
 
     const { data } = await supabase
       .from("recent_searches")
       .select("movie_id")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .order("searched_at", { ascending: false })
       .limit(16);
 
@@ -113,22 +111,17 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
     setRecentMovies(ordered);
   }
 
+  // Re-runs whenever the shared auth state changes (login/logout) --
+  // this used to independently listen for that itself; now it just
+  // reacts to the one shared check instead.
   useEffect(() => {
+    if (authLoading) return;
     loadRecents();
-
-    // Without this, logging out (or into a different account) leaves
-    // the previous session's Recently Searched list sitting on screen,
-    // since this only used to run once when the page first mounted.
-    const { data: listener } = supabase.auth.onAuthStateChange(() => {
-      loadRecents();
-    });
-    return () => listener.subscription.unsubscribe();
-  }, []);
+  }, [userId, authLoading]);
 
   async function handleClearRecents() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      await supabase.from("recent_searches").delete().eq("user_id", user.id);
+    if (userId) {
+      await supabase.from("recent_searches").delete().eq("user_id", userId);
     } else {
       clearGuestRecents();
     }
@@ -196,12 +189,11 @@ export default function MovieBrowser({ movies }: { movies: Movie[] }) {
 
     // Record this the same way clicking a search result does, so it
     // shows up in Recently Searched afterward.
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
+    if (userId) {
       await supabase
         .from("recent_searches")
         .upsert(
-          { user_id: user.id, movie_id: movie.id, searched_at: new Date().toISOString() },
+          { user_id: userId, movie_id: movie.id, searched_at: new Date().toISOString() },
           { onConflict: "user_id,movie_id" }
         );
     } else {

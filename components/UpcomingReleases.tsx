@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
+import { useAuth } from "@/lib/AuthContext";
 
 type UpcomingItem = {
   id: string;
@@ -26,47 +27,57 @@ function formatReleaseDate(dateStr: string) {
 export default function UpcomingReleases() {
   const supabase = createClient();
   const router = useRouter();
+  const { loading: authLoading, userId } = useAuth();
   const [items, setItems] = useState<UpcomingItem[] | null>(null); // null = "not logged in / not loaded"
   const [page, setPage] = useState(0);
 
+  async function loadUpcoming() {
+    if (!userId) {
+      setItems([]);
+      return;
+    }
+
+    const todayStr = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+    const { data: watchlistItems } = await supabase
+      .from("watchlist")
+      .select("id, title, release_date, tmdb_id")
+      .eq("user_id", userId)
+      .not("release_date", "is", null)
+      .gt("release_date", todayStr)
+      .order("release_date", { ascending: true });
+
+    if (!watchlistItems || watchlistItems.length === 0) {
+      setItems([]);
+      return;
+    }
+
+    // Some of these might already be in the shared movies catalog
+    // (an admin added them) -- if so, link to that movie's page.
+    const tmdbIds = watchlistItems.map((w) => w.tmdb_id);
+    const { data: movies } = await supabase
+      .from("movies")
+      .select("slug, tmdb_id")
+      .in("tmdb_id", tmdbIds);
+    const slugByTmdbId = Object.fromEntries((movies ?? []).map((m) => [m.tmdb_id, m.slug]));
+
+    setItems(
+      watchlistItems.map((w) => ({
+        id: w.id,
+        title: w.title,
+        releaseDateStr: w.release_date,
+        slug: slugByTmdbId[w.tmdb_id] ?? null,
+      }))
+    );
+  }
+
+  // Re-runs whenever the shared auth state changes (login/logout) --
+  // this used to independently listen for that itself; now it just
+  // reacts to the one shared check instead.
   useEffect(() => {
-    (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const todayStr = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
-      const { data: watchlistItems } = await supabase
-        .from("watchlist")
-        .select("id, title, release_date, tmdb_id")
-        .eq("user_id", user.id)
-        .not("release_date", "is", null)
-        .gt("release_date", todayStr)
-        .order("release_date", { ascending: true });
-
-      if (!watchlistItems || watchlistItems.length === 0) {
-        setItems([]);
-        return;
-      }
-
-      // Some of these might already be in the shared movies catalog
-      // (an admin added them) -- if so, link to that movie's page.
-      const tmdbIds = watchlistItems.map((w) => w.tmdb_id);
-      const { data: movies } = await supabase
-        .from("movies")
-        .select("slug, tmdb_id")
-        .in("tmdb_id", tmdbIds);
-      const slugByTmdbId = Object.fromEntries((movies ?? []).map((m) => [m.tmdb_id, m.slug]));
-
-      setItems(
-        watchlistItems.map((w) => ({
-          id: w.id,
-          title: w.title,
-          releaseDateStr: w.release_date,
-          slug: slugByTmdbId[w.tmdb_id] ?? null,
-        }))
-      );
-    })();
-  }, []);
+    if (authLoading) return;
+    setPage(0);
+    loadUpcoming();
+  }, [userId, authLoading]);
 
   // Not logged in, or nothing upcoming -- don't show the widget at all.
   if (!items || items.length === 0) return null;

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
 import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
+import { useAuth } from "@/lib/AuthContext";
 
 type WatchlistItem = {
   id: string;
@@ -19,27 +20,24 @@ export default function WatchlistModal() {
   const supabase = createClient();
   const router = useRouter();
   const pathname = usePathname();
+  const { userId } = useAuth();
 
   const [open, setOpen] = useState(false);
   useBodyScrollLock(open);
-  const [loggedIn, setLoggedIn] = useState(false);
   const [items, setItems] = useState<WatchlistItem[] | null>(null); // null = loading
   const [search, setSearch] = useState("");
 
   async function loadWatchlist() {
     setItems(null);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      setLoggedIn(false);
+    if (!userId) {
       setItems([]);
       return;
     }
-    setLoggedIn(true);
 
     const { data: watchlistRows } = await supabase
       .from("watchlist")
       .select("id, title, year, tmdb_id, release_date, created_at")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .order("created_at", { ascending: false });
 
     const rows = watchlistRows ?? [];
@@ -144,11 +142,11 @@ export default function WatchlistModal() {
               </div>
             </div>
 
-            {!loggedIn && items !== null && (
+            {!userId && items !== null && (
               <div className="modal-empty">Log in to see your watchlist.</div>
             )}
 
-            {loggedIn && items && items.length > 0 && (
+            {userId && items && items.length > 0 && (
               <input
                 type="text"
                 className="modal-search-input"
@@ -158,10 +156,10 @@ export default function WatchlistModal() {
               />
             )}
 
-            {loggedIn && items !== null && items.length === 0 && (
+            {userId && items !== null && items.length === 0 && (
               <div className="modal-empty">Nothing on the watchlist yet.</div>
             )}
-            {loggedIn && items !== null && items.length > 0 && visible.length === 0 && (
+            {userId && items !== null && items.length > 0 && visible.length === 0 && (
               <div className="modal-empty">No matches.</div>
             )}
 
