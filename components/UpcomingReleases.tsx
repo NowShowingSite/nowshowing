@@ -2,12 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { createClient } from "@/lib/supabaseClient";
 import { useAuth } from "@/lib/AuthContext";
+import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
 
 type UpcomingItem = {
   id: string;
   title: string;
+  year: number | null;
+  genre: string | null;
+  director: string | null;
+  posterUrl: string | null;
   releaseDateStr: string;
   slug: string | null; // null if this movie isn't in the shared catalog yet
 };
@@ -30,6 +36,8 @@ export default function UpcomingReleases() {
   const { loading: authLoading, userId } = useAuth();
   const [items, setItems] = useState<UpcomingItem[] | null>(null); // null = "not logged in / not loaded"
   const [page, setPage] = useState(0);
+  const [preview, setPreview] = useState<UpcomingItem | null>(null);
+  useBodyScrollLock(preview !== null);
 
   async function loadUpcoming() {
     if (!userId) {
@@ -40,7 +48,7 @@ export default function UpcomingReleases() {
     const todayStr = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
     const { data: watchlistItems } = await supabase
       .from("watchlist")
-      .select("id, title, release_date, tmdb_id")
+      .select("id, title, year, genre, director, poster_url, release_date, tmdb_id")
       .eq("user_id", userId)
       .not("release_date", "is", null)
       .gt("release_date", todayStr)
@@ -64,6 +72,10 @@ export default function UpcomingReleases() {
       watchlistItems.map((w) => ({
         id: w.id,
         title: w.title,
+        year: w.year,
+        genre: w.genre,
+        director: w.director,
+        posterUrl: w.poster_url,
         releaseDateStr: w.release_date,
         slug: slugByTmdbId[w.tmdb_id] ?? null,
       }))
@@ -100,18 +112,58 @@ export default function UpcomingReleases() {
       <div className="upcoming-list">
         {pageItems.map((item) => (
           <p key={item.id} className="upcoming-strip">
-            {item.slug ? (
-              <a className="up-title" onClick={() => router.push(`/movie/${item.slug}`)}>
-                {item.title}
-              </a>
-            ) : (
-              <span className="up-title">{item.title}</span>
-            )}
+            <a
+              className="up-title"
+              onClick={() => (item.slug ? router.push(`/movie/${item.slug}`) : setPreview(item))}
+            >
+              {item.title}
+            </a>
             <span className="up-sep">—</span>
             <span className="up-date">{formatReleaseDate(item.releaseDateStr)}</span>
           </p>
         ))}
       </div>
+
+      {preview && (
+        <div className="modal-overlay" onClick={() => setPreview(null)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" aria-label="Close" onClick={() => setPreview(null)}>
+              &times;
+            </button>
+            <div style={{ display: "flex", gap: "16px" }}>
+              <div
+                style={{
+                  position: "relative",
+                  flex: "0 0 100px",
+                  width: "100px",
+                  aspectRatio: "2 / 3",
+                  borderRadius: "6px",
+                  overflow: "hidden",
+                  background: "linear-gradient(160deg, var(--surface-2), var(--surface))",
+                }}
+              >
+                {preview.posterUrl && (
+                  <Image src={preview.posterUrl} alt="" fill sizes="100px" style={{ objectFit: "cover" }} />
+                )}
+              </div>
+              <div>
+                <h2 className="modal-title">{preview.title}</h2>
+                <p className="modal-subtitle" style={{ marginBottom: 8 }}>
+                  {[preview.year, preview.genre].filter(Boolean).join(" · ")}
+                </p>
+                {preview.director && (
+                  <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "0.8rem", color: "var(--text)" }}>
+                    Director: {preview.director}
+                  </p>
+                )}
+                <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "0.8rem", color: "var(--text)" }}>
+                  Releases {formatReleaseDate(preview.releaseDateStr)}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <button
         className="upcoming-arrow upcoming-arrow-next"
