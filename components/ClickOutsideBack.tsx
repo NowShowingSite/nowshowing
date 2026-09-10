@@ -7,7 +7,9 @@ export default function ClickOutsideBack({ children }: { children: React.ReactNo
 
   return (
     <div className="page-click-back-wrap" onClick={() => router.back()}>
-      <div onClick={(e) => e.stopPropagation()}>{children}</div>
+      <div style={{ width: "fit-content", maxWidth: "100%" }} onClick={(e) => e.stopPropagation()}>
+        {children}
+      </div>
     </div>
   );
 }
