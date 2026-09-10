@@ -737,6 +737,9 @@ h1, h2, h3 {
   font-size: 0.85rem;
   color: var(--text);
   transition: border-color 0.15s ease, color 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .decade-pill:hover {
