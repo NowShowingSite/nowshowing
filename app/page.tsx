@@ -95,6 +95,20 @@ function hashString(s: string): number {
   return h;
 }
 
+// Gets today's date as "YYYY-MM-DD" in US Eastern time specifically --
+// not the server's own timezone (which on Vercel is UTC). Using
+// Intl's built-in timezone conversion means this automatically
+// accounts for EST/EDT (daylight saving) transitions correctly,
+// without needing any extra date library.
+function getEasternDateString(): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
 // Picks a movie for today deterministically. Each movie gets a score
 // of hash(today's date + its id), and whichever scores highest wins.
 // The date must come FIRST in that string -- this hash is a rolling
@@ -114,7 +128,7 @@ function hashString(s: string): number {
 function pickMovieOfTheDay(movies: any[]) {
   const eligible = movies.filter((m) => m.media_type !== "tv");
   if (eligible.length === 0) return null;
-  const todayStr = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+  const todayStr = getEasternDateString(); // "YYYY-MM-DD", Eastern time
   return eligible.reduce((best, m) =>
     hashString(todayStr + m.id) > hashString(todayStr + best.id) ? m : best
   );
