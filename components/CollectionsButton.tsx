@@ -103,10 +103,10 @@ export default function CollectionsButton({
               <>
                 <h2 className="modal-title">Collections</h2>
                 <p className="modal-subtitle">This title is part of</p>
-                <div className="decade-grid">
+                <div className="modal-movie-list">
                   {collections.map((c) => (
-                    <div key={c} className="decade-pill" onClick={() => openCollection(c)}>
-                      {c}
+                    <div key={c} className="modal-movie-item" onClick={() => openCollection(c)}>
+                      <span className="modal-movie-title">{c}</span>
                     </div>
                   ))}
                 </div>
