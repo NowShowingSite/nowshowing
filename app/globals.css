@@ -878,7 +878,7 @@ h1, h2, h3 {
 /* ---------- Collection badges ---------- */
 .collection-badge-stack {
   position: absolute;
-  top: 18px;
+  top: 10px;
   left: 40px;
   display: flex;
   flex-direction: row;
