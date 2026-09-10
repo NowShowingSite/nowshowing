@@ -87,7 +87,13 @@ export default function CollectionsButton({
       </button>
 
       {open && (
-        <div className="modal-overlay" onClick={() => setOpen(false)}>
+        <div
+          className="modal-overlay"
+          onClick={() => {
+            if (view.kind === "results") setView({ kind: "list" });
+            else setOpen(false);
+          }}
+        >
           <div className="modal-card" onClick={(e) => e.stopPropagation()}>
             <button className="modal-close" aria-label="Close" onClick={() => setOpen(false)}>
               &times;
