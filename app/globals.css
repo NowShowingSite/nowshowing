@@ -876,39 +876,27 @@ h1, h2, h3 {
 }
 
 /* ---------- Collection badges ---------- */
-.collection-badge-stack {
+.collections-trigger-btn {
   position: absolute;
-  top: 0;
-  left: 40px;
-  height: 44px;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
+  top: 18px;
+  right: 24px;
   z-index: 2;
-  max-width: calc(100% - 80px);
-}
-
-.collection-badge {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 6px;
-  cursor: pointer;
+  justify-content: center;
+  border: 1px solid var(--gold-dim);
+  border-radius: 20px;
+  padding: 7px 16px;
+  color: var(--gold);
   font-family: 'Space Mono', monospace;
   font-size: 0.7rem;
-  color: var(--text);
-  background: var(--surface);
-  border: 1px solid var(--divider);
-  border-radius: 20px;
-  padding: 5px 12px;
-  transition: border-color 0.15s ease, color 0.15s ease;
+  cursor: pointer;
+  background: none;
+  transition: border-color 0.15s ease, opacity 0.15s ease;
 }
 
-.collection-badge:hover {
-  color: var(--gold);
-  border-color: var(--gold-dim);
-  opacity: 1;
+.collections-trigger-btn:hover {
+  border-color: var(--gold);
 }
 
 .surprise-btn {

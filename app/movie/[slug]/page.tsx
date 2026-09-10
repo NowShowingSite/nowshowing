@@ -4,7 +4,7 @@ import RatingForm from "@/components/RatingForm";
 import DirectorLink from "@/components/DirectorLink";
 import WatchlistToggle from "@/components/WatchlistToggle";
 import ChangePosterButton from "@/components/ChangePosterButton";
-import CollectionLink from "@/components/CollectionLink";
+import CollectionsButton from "@/components/CollectionsButton";
 import BackLink from "@/components/BackLink";
 import ClickOutsideBack from "@/components/ClickOutsideBack";
 
@@ -138,11 +138,7 @@ export default async function MovieDetailPage({
           posterUrl={movie.poster_url}
         />
         {movie.collections && movie.collections.length > 0 && (
-          <div className="collection-badge-stack">
-            {movie.collections.map((c: string) => (
-              <CollectionLink key={c} name={c} currentSlug={params.slug} />
-            ))}
-          </div>
+          <CollectionsButton collections={movie.collections} currentSlug={params.slug} />
         )}
         <div className="ticket-layout">
           <div className="poster-col">
