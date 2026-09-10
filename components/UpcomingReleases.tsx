@@ -6,6 +6,7 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabaseClient";
 import { useAuth } from "@/lib/AuthContext";
 import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
+import DirectorLink from "@/components/DirectorLink";
 
 type UpcomingItem = {
   id: string;
@@ -153,7 +154,7 @@ export default function UpcomingReleases() {
                 </p>
                 {preview.director && (
                   <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "0.8rem", color: "var(--text)" }}>
-                    Director: {preview.director}
+                    Director: <DirectorLink name={preview.director} currentSlug="" />
                   </p>
                 )}
                 <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "0.8rem", color: "var(--text)" }}>
