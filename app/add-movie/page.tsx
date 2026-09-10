@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabaseClient";
+import ClickOutsideBack from "@/components/ClickOutsideBack";
 
 // Turns a title into a URL-friendly slug, e.g. "The Batman" -> "the-batman".
 function slugify(title: string, year: number | null) {
@@ -102,21 +103,24 @@ export default function AddMoviePage() {
 
   if (!isAdmin) {
     return (
-      <div className="movie-list">
-        <Link href="/" className="back-link">
-          ← Back to search
-        </Link>
-        <p>You don't have access to this page.</p>
-      </div>
+      <ClickOutsideBack>
+        <div className="movie-list">
+          <Link href="/" className="back-link">
+            ← Back to search
+          </Link>
+          <p>You don't have access to this page.</p>
+        </div>
+      </ClickOutsideBack>
     );
   }
 
   return (
-    <div className="movie-list">
-      <Link href="/" className="back-link">
-        ← Back to search
-      </Link>
-      <h1>Add a Title</h1>
+    <ClickOutsideBack>
+      <div className="movie-list">
+        <Link href="/" className="back-link">
+          ← Back to search
+        </Link>
+        <h1>Add a Title</h1>
 
       <div className="filter-btn-row" style={{ position: "static", padding: 0, margin: "0 0 12px" }}>
         <button
@@ -196,5 +200,6 @@ export default function AddMoviePage() {
         ))}
       </div>
     </div>
+    </ClickOutsideBack>
   );
 }

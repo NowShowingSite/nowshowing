@@ -6,6 +6,7 @@ import WatchlistToggle from "@/components/WatchlistToggle";
 import ChangePosterButton from "@/components/ChangePosterButton";
 import CollectionLink from "@/components/CollectionLink";
 import BackLink from "@/components/BackLink";
+import ClickOutsideBack from "@/components/ClickOutsideBack";
 
 // Same fix as the home page -- always check the database fresh,
 // never serve a stale snapshot from build time.
@@ -53,11 +54,15 @@ async function getMovie(slug: string) {
       .single(),
     // The site's "official" score is the average of just the admin
     // accounts (Adam/Alex/Rob) -- everyone else's ratings are tracked
-    // separately and shown elsewhere.
+    // separately and shown elsewhere. Ordered by an explicit sort_order
+    // (set manually per account) so it's always Adam, Alex, Rob no
+    // matter who actually signed up first -- falls back to signup
+    // order for any admin account that doesn't have one set yet.
     supabase
       .from("profiles")
       .select("id, username")
       .eq("is_admin", true)
+      .order("sort_order", { ascending: true, nullsFirst: false })
       .order("created_at", { ascending: true }),
   ]);
 
@@ -102,22 +107,27 @@ export default async function MovieDetailPage({
 
   if (error) {
     return (
-      <div className="detail-wrap">
-        <BackLink />
-      </div>
+      <ClickOutsideBack>
+        <div className="detail-wrap">
+          <BackLink />
+        </div>
+      </ClickOutsideBack>
     );
   }
   if (!movie) {
     return (
-      <div className="detail-wrap">
-        <BackLink />
-      </div>
+      <ClickOutsideBack>
+        <div className="detail-wrap">
+          <BackLink />
+        </div>
+      </ClickOutsideBack>
     );
   }
 
   return (
-    <div className="detail-wrap">
-      <BackLink />
+    <ClickOutsideBack>
+      <div className="detail-wrap">
+        <BackLink />
       <div className="ticket">
         <WatchlistToggle
           tmdbId={movie.tmdb_id}
@@ -182,5 +192,6 @@ export default async function MovieDetailPage({
         </div>
       </div>
     </div>
+    </ClickOutsideBack>
   );
 }

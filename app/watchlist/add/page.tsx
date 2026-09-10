@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
+import ClickOutsideBack from "@/components/ClickOutsideBack";
 
 export default function AddToWatchlistPage() {
   const supabase = createClient();
@@ -69,50 +70,54 @@ export default function AddToWatchlistPage() {
 
   if (!loggedIn) {
     return (
-      <div className="movie-list">
-        <Link href="/" className="back-link">
-          ← Back to search
-        </Link>
-        <p>You need to log in to add movies to your watchlist.</p>
-      </div>
+      <ClickOutsideBack>
+        <div className="movie-list">
+          <Link href="/" className="back-link">
+            ← Back to search
+          </Link>
+          <p>You need to log in to add movies to your watchlist.</p>
+        </div>
+      </ClickOutsideBack>
     );
   }
 
   return (
-    <div className="movie-list">
-      <Link href="/watchlist" className="back-link">
-        ← Back to Watchlist
-      </Link>
-      <h1>Add to Watchlist</h1>
-      <div className="rating-form">
-        <input
-          type="text"
-          placeholder="Search TMDB by title..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-          style={{ flex: 1, width: "auto" }}
-        />
-        <button onClick={handleSearch}>Search</button>
-      </div>
+    <ClickOutsideBack>
+      <div className="movie-list">
+        <Link href="/watchlist" className="back-link">
+          ← Back to Watchlist
+        </Link>
+        <h1>Add to Watchlist</h1>
+        <div className="rating-form">
+          <input
+            type="text"
+            placeholder="Search TMDB by title..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            style={{ flex: 1, width: "auto" }}
+          />
+          <button onClick={handleSearch}>Search</button>
+        </div>
 
-      {status && <p>{status}</p>}
+        {status && <p>{status}</p>}
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "16px" }}>
-        {results.map((r) => (
-          <div
-            key={r.tmdbId}
-            className="movie-row"
-            style={{ cursor: saving ? "default" : "pointer", opacity: saving ? 0.5 : 1 }}
-            onClick={() => !saving && handlePick(r.tmdbId)}
-          >
-            <span>
-              {r.title} {r.year ? `(${r.year})` : ""}
-            </span>
-            <span>Add →</span>
-          </div>
-        ))}
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "16px" }}>
+          {results.map((r) => (
+            <div
+              key={r.tmdbId}
+              className="movie-row"
+              style={{ cursor: saving ? "default" : "pointer", opacity: saving ? 0.5 : 1 }}
+              onClick={() => !saving && handlePick(r.tmdbId)}
+            >
+              <span>
+                {r.title} {r.year ? `(${r.year})` : ""}
+              </span>
+              <span>Add →</span>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </ClickOutsideBack>
   );
 }

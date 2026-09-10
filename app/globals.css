@@ -1400,6 +1400,11 @@ h1, h2, h3 {
   cursor: default;
 }
 
+.page-click-back-wrap {
+  min-height: calc(100vh - 60px);
+  cursor: default;
+}
+
 .login-page-content {
   width: 100%;
   max-width: 360px;
