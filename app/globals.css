@@ -879,13 +879,14 @@ h1, h2, h3 {
 .collection-badge-stack {
   position: absolute;
   top: 18px;
-  right: 24px;
+  left: 40px;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
   z-index: 2;
-  max-width: calc(100% - 48px);
+  max-width: calc(100% - 80px);
 }
 
 .collection-badge {
@@ -901,7 +902,6 @@ h1, h2, h3 {
   border-radius: 20px;
   padding: 5px 12px;
   transition: border-color 0.15s ease, color 0.15s ease;
-  text-align: right;
 }
 
 .collection-badge:hover {
