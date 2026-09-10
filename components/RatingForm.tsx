@@ -144,13 +144,13 @@ export default function RatingForm({
             );
           })}
 
-        {expanded && isAdmin && userAvg !== null && (
+        {expanded && isAdmin && (
           <div className="inline-score-item">
             <div
               className="inline-score-badge"
               style={{ borderColor: ratingColor(userAvg), color: ratingColor(userAvg) }}
             >
-              {formatRating(userAvg)}
+              {userAvg !== null ? formatRating(userAvg) : "N/A"}
             </div>
             <span className="inline-score-name">Users</span>
           </div>
