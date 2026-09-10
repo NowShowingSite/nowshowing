@@ -13,7 +13,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
 
-  async function handleLogin() {
+  async function handleLogin(e?: React.FormEvent) {
+    e?.preventDefault();
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       setMessage(error.message);
@@ -81,23 +82,27 @@ export default function LoginPage() {
         </Link>
         <div className="login-box">
           <h2>Login / Sign up</h2>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-            autoFocus
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-          />
-          <button onClick={handleLogin}>Log in</button>
-          <button onClick={handleSignUp}>Sign up</button>
+          <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              autoComplete="username"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoFocus
+            />
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button type="submit">Log in</button>
+            <button type="button" onClick={handleSignUp}>Sign up</button>
+          </form>
           {message && <p>{message}</p>}
         </div>
       </div>
