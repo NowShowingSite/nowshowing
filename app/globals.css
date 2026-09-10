@@ -668,7 +668,7 @@ h1, h2, h3 {
   gap: 12px;
   padding: 12px 14px;
   background: var(--surface-2);
-  border: 1px solid var(--divider);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 8px;
   cursor: pointer;
   transition: border-color 0.15s ease;
