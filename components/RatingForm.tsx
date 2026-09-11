@@ -27,12 +27,16 @@ export default function RatingForm({
   avg,
   adminBreakdown,
   userAvg,
+  isUnreleased = false,
+  releaseDateText = null,
 }: {
   movieId: string;
   tmdbId?: number | null;
   avg: number | null;
   adminBreakdown: AdminScore[];
   userAvg: number | null;
+  isUnreleased?: boolean;
+  releaseDateText?: string | null;
 }) {
   const supabase = createClient();
   const router = useRouter();
@@ -69,6 +73,7 @@ export default function RatingForm({
   const needsLogin = !authLoading && !userId;
 
   function handleOpenRate() {
+    if (isUnreleased) return;
     setError("");
     setScoreInput(myScore !== null ? formatRating(myScore) : "");
     setRateOpen(true);
@@ -173,9 +178,22 @@ export default function RatingForm({
         )}
       </div>
 
-      <span className="rate-your-score-link" onClick={handleOpenRate}>
-        Rate this movie
-      </span>
+      {isUnreleased ? (
+        <p
+          style={{
+            marginTop: 10,
+            fontFamily: "'Space Mono', monospace",
+            fontSize: "0.78rem",
+            color: "var(--text)",
+          }}
+        >
+          Releases {releaseDateText}
+        </p>
+      ) : (
+        <span className="rate-your-score-link" onClick={handleOpenRate}>
+          Rate this movie
+        </span>
+      )}
 
       {rateOpen && (
         <div className="modal-overlay" onClick={() => setRateOpen(false)}>
