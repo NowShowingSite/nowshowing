@@ -37,10 +37,17 @@ const fetchMoviesAndRatings = unstable_cache(
     // unfiltered, not scoped to whatever movies came back. Running
     // them together instead of one after another saves a full
     // round-trip of latency.
+    // Admins can add a title before it's actually out (so it can be
+    // linked from director/collections pages and the countdown) --
+    // but it shouldn't show up in general browsing/search/Movie of
+    // the Day until its release_date has actually passed.
+    const todayStr = new Date().toISOString().slice(0, 10);
+
     const [moviesResult, ratingsResult] = await Promise.all([
       supabase
         .from("movies")
         .select("id, slug, title, year, poster_url, genre, media_type")
+        .or(`release_date.is.null,release_date.lte.${todayStr}`)
         .order("title"),
       supabase.from("ratings").select("movie_id, score"),
     ]);
