@@ -129,7 +129,7 @@ export default function UpcomingReleases() {
         <div className="modal-overlay" onClick={() => setPreview(null)}>
           <div
             className="modal-card"
-            style={{ maxWidth: 640, padding: 0, background: "none", border: "none", boxShadow: "none" }}
+            style={{ maxWidth: 760, padding: 0, background: "none", border: "none", boxShadow: "none" }}
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -140,7 +140,7 @@ export default function UpcomingReleases() {
             >
               &times;
             </button>
-            <div className="ticket" style={{ maxHeight: "85vh", overflowY: "auto" }}>
+            <div className="ticket">
               <div className="ticket-layout">
                 <div className="poster-col">
                   <div className="ticket-poster">
