@@ -127,39 +127,64 @@ export default function UpcomingReleases() {
 
       {preview && (
         <div className="modal-overlay" onClick={() => setPreview(null)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" aria-label="Close" onClick={() => setPreview(null)}>
+          <div
+            className="modal-card"
+            style={{ maxWidth: 640, padding: 0, background: "none", border: "none", boxShadow: "none" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="modal-close"
+              aria-label="Close"
+              onClick={() => setPreview(null)}
+              style={{ top: 8, right: 8 }}
+            >
               &times;
             </button>
-            <div style={{ display: "flex", gap: "16px" }}>
-              <div
-                style={{
-                  position: "relative",
-                  flex: "0 0 100px",
-                  width: "100px",
-                  aspectRatio: "2 / 3",
-                  borderRadius: "6px",
-                  overflow: "hidden",
-                  background: "linear-gradient(160deg, var(--surface-2), var(--surface))",
-                }}
-              >
-                {preview.posterUrl && (
-                  <Image src={preview.posterUrl} alt="" fill sizes="100px" style={{ objectFit: "cover" }} />
-                )}
-              </div>
-              <div>
-                <h2 className="modal-title">{preview.title}</h2>
-                <p className="modal-subtitle" style={{ marginBottom: 8 }}>
-                  {[preview.year, preview.genre].filter(Boolean).join(" · ")}
-                </p>
-                {preview.director && (
-                  <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "0.8rem", color: "var(--text)" }}>
-                    Director: <DirectorLink name={preview.director} currentSlug="" />
+            <div className="ticket" style={{ maxHeight: "85vh", overflowY: "auto" }}>
+              <div className="ticket-layout">
+                <div className="poster-col">
+                  <div className="ticket-poster">
+                    {preview.posterUrl ? (
+                      <Image src={preview.posterUrl} alt="" fill sizes="180px" style={{ objectFit: "contain" }} />
+                    ) : (
+                      "No poster yet"
+                    )}
+                  </div>
+                </div>
+                <div className="ticket-info">
+                  <div className="rating-row">
+                    <div className="rating-badge" style={{ borderColor: "var(--text-muted)" }}>
+                      <span className="num" style={{ color: "var(--text-muted)" }}>N/A</span>
+                      <span className="out out-small">
+                        NOT YET<br />RATED
+                      </span>
+                    </div>
+                  </div>
+
+                  <h1 className="detail-title">{preview.title}</h1>
+                  <div className="meta-line">
+                    <span className="meta-year">{preview.year ?? ""}</span>
+                    {preview.genre && <span>{preview.genre}</span>}
+                  </div>
+                  <div className="meta-director">
+                    Director:{" "}
+                    {preview.director ? (
+                      <DirectorLink name={preview.director} currentSlug="" />
+                    ) : (
+                      "Unknown"
+                    )}
+                  </div>
+                  <p
+                    style={{
+                      marginTop: 10,
+                      fontFamily: "'Space Mono', monospace",
+                      fontSize: "0.78rem",
+                      color: "var(--text)",
+                    }}
+                  >
+                    Releases {formatReleaseDate(preview.releaseDateStr)}
                   </p>
-                )}
-                <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "0.8rem", color: "var(--text)" }}>
-                  Releases {formatReleaseDate(preview.releaseDateStr)}
-                </p>
+                </div>
               </div>
             </div>
           </div>
