@@ -48,9 +48,12 @@ export default function DirectorLink({
 
     let avgById: Record<string, number> = {};
     if (ids.length > 0) {
-      const { data: ratings } = await supabase.from("ratings").select("movie_id, score").in("movie_id", ids);
+      const { data: admins } = await supabase.from("profiles").select("id").eq("is_admin", true);
+      const adminIdSet = new Set((admins ?? []).map((a) => a.id));
+      const { data: ratings } = await supabase.from("ratings").select("movie_id, user_id, score").in("movie_id", ids);
       const scoresById: Record<string, number[]> = {};
       (ratings ?? []).forEach((r) => {
+        if (!adminIdSet.has(r.user_id)) return;
         if (!scoresById[r.movie_id]) scoresById[r.movie_id] = [];
         scoresById[r.movie_id].push(r.score);
       });
