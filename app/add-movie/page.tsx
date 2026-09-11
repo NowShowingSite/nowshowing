@@ -74,6 +74,7 @@ export default function AddMoviePage() {
       title: details.title,
       year: details.year,
       year_end: details.yearEnd,
+      release_date: details.releaseDate,
       genre: details.genre,
       director: mediaType === "movie" ? details.director : null,
       creator: mediaType === "tv" ? details.director : null,
