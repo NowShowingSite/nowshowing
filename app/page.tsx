@@ -43,13 +43,14 @@ const fetchMoviesAndRatings = unstable_cache(
     // the Day until its release_date has actually passed.
     const todayStr = new Date().toISOString().slice(0, 10);
 
-    const [moviesResult, ratingsResult] = await Promise.all([
+    const [moviesResult, ratingsResult, adminsResult] = await Promise.all([
       supabase
         .from("movies")
         .select("id, slug, title, year, poster_url, genre, media_type")
         .or(`release_date.is.null,release_date.lte.${todayStr}`)
         .order("title"),
-      supabase.from("ratings").select("movie_id, score"),
+      supabase.from("ratings").select("movie_id, user_id, score"),
+      supabase.from("profiles").select("id").eq("is_admin", true),
     ]);
 
     const { data: movies, error } = moviesResult;
@@ -57,9 +58,15 @@ const fetchMoviesAndRatings = unstable_cache(
       return { movies: [], error: error.message };
     }
     const { data: ratings } = ratingsResult;
+    const adminIdSet = new Set((adminsResult.data ?? []).map((a) => a.id));
 
+    // Only admin (Adam/Alex/Rob) ratings count toward the "official"
+    // score shown everywhere on the site -- everyone else's ratings
+    // are tracked separately (as "Users") and shouldn't blend into
+    // this number, same as the movie detail page.
     const scoresByMovie: Record<string, number[]> = {};
     (ratings ?? []).forEach((r) => {
+      if (!adminIdSet.has(r.user_id)) return;
       if (!scoresByMovie[r.movie_id]) scoresByMovie[r.movie_id] = [];
       scoresByMovie[r.movie_id].push(r.score);
     });
