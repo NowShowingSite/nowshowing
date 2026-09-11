@@ -12,6 +12,16 @@ import ClickOutsideBack from "@/components/ClickOutsideBack";
 // never serve a stale snapshot from build time.
 export const dynamic = "force-dynamic";
 
+// TMDB gives dates like "2026-11-13" with no time attached. Parsing
+// that directly with `new Date(...)` treats it as UTC midnight, which
+// then shifts a day earlier once displayed in most US/western
+// timezones. Parsing the year/month/day as local values avoids that.
+function formatReleaseDate(dateStr: string) {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const d = new Date(year, month - 1, day);
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
 // Runtime is stored in minutes -- format as "1h 40m" instead of "100m".
 function formatRuntime(minutes: number | null) {
   if (typeof minutes !== "number") return "";
@@ -49,7 +59,7 @@ async function getMovie(slug: string) {
   const [movieResult, adminsResult] = await Promise.all([
     supabase
       .from("movies")
-      .select("id, title, year, year_end, genre, director, creator, runtime, poster_url, tmdb_id, collections, trailer_url, media_type")
+      .select("id, title, year, year_end, genre, director, creator, runtime, poster_url, tmdb_id, collections, trailer_url, media_type, release_date")
       .eq("slug", slug)
       .single(),
     // The site's "official" score is the average of just the admin
@@ -118,6 +128,8 @@ export default async function MovieDetailPage({
   params: { slug: string };
 }) {
   const { movie, error, avg, adminBreakdown, userAvg } = await getMovie(params.slug);
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const isUnreleased = !!(movie?.release_date && movie.release_date > todayStr);
 
   if (error) {
     return (
@@ -175,7 +187,15 @@ export default async function MovieDetailPage({
                 breakdown, or use the small link below to submit your own
                 score. This is a client component since it needs to know
                 who's logged in. */}
-            <RatingForm movieId={movie.id} tmdbId={movie.tmdb_id} avg={avg} adminBreakdown={adminBreakdown} userAvg={userAvg} />
+            <RatingForm
+              movieId={movie.id}
+              tmdbId={movie.tmdb_id}
+              avg={avg}
+              adminBreakdown={adminBreakdown}
+              userAvg={userAvg}
+              isUnreleased={isUnreleased}
+              releaseDateText={isUnreleased ? formatReleaseDate(movie.release_date) : null}
+            />
 
             <h1 className="detail-title" style={{ fontSize: getTitleFontSize(movie.title) }}>
               {movie.title}
